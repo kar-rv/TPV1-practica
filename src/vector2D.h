@@ -3,7 +3,6 @@
 
 #include <iostream>
 
-
 /**
  * Vector bidimensional genérico.
  */
@@ -18,6 +17,7 @@ public:
 
 	// Coordenadas del vector
 	T getX() const { return x; }
+	T getY() const { return y; }
 
 	// Operadores
 	Vector2D operator+(const Vector2D& otro) const {
@@ -32,7 +32,8 @@ public:
 	}
 };
 
+template<std::floating_point T = float>
 // TODO: definir alias Point2D<T>
-using Point2D = Vector2D<float>;
+using Point2D = Vector2D<T>;
 
 #endif // VECTOR2D_H

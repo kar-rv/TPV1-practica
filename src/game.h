@@ -5,11 +5,13 @@
 #include <array>
 #include <istream>
 #include <vector>
-
-// #include "rectangle.h"
+#include "rectangle.h"
 
 // Declaraciones anticipadas
 class Texture;
+class arrow;
+class balloon;
+class bow;
 
 /**
  * Clase principal del juego.
@@ -29,6 +31,7 @@ public:
 	{
 		BOW = 0,
 		ARROW,
+		BALLOON,
 		NUM_TEXTURES
 	};
 
@@ -40,11 +43,15 @@ private:
 	void render() const;
 	void update();
 	void handleEvents();
+	void checkCollision();
 
 	bool exit;
 
 	// Elemento del juego
 	// TODO: añadir atributos para los objetos del juego
+	std::vector<arrow*> arrows;
+	std::vector<balloon*> balloons;
+	bow* bow;
 
 public:
 	Game();
