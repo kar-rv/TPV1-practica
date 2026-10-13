@@ -6,6 +6,7 @@
 
 #include "texture.h"
 #include "bow.h"
+#include "balloon.h"
 #include "rectangle.h"
 
 using namespace std;
@@ -33,7 +34,7 @@ constexpr array<TextureSpec, Game::NUM_TEXTURES> textureList{
 };
 
 Game::Game()
-  : exit(false)
+  : exit(false), random(time(nullptr))
 {
 	// Carga SDL y crea la ventana con su renderizador
 	if (!SDL_Init(SDL_INIT_VIDEO))
@@ -63,8 +64,8 @@ Game::Game()
 	// SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
 
 	// TODO: crear los objetos del juego
-	Rectangle rect(Point2D<>(0, 0), 100, 100);
-	bowPtr = new bow(rect, Vector2D<>(0, 0), textures[BOW], 10);
+	Rectangle rect(Point2D<>(25, 100), 100, 100);
+	bowPtr = new bow(rect, Vector2D<>(0, 10), textures[BOW], 10);
 }
 
 Game::~Game()
@@ -78,9 +79,12 @@ Game::render() const
 	SDL_RenderClear(renderer);
 
 	// TODO
-	textures[BACKGROUND]->render();
+	textures[BACKGROUND]->render(); // Llama al método de Texture que dibuja a pantalla completa
+	
 	bowPtr->render();
-
+	for (auto b : balloons) {
+		b->render();
+	}
 
 	SDL_RenderPresent(renderer);
 }
@@ -89,6 +93,13 @@ void
 Game::update()
 {
 	// TODO
+	int contador = 0;
+	if (contador < 15) {
+		generateBalloon();
+		contador = 0;
+	}
+	else
+		contador += 1;
 }
 
 void
@@ -96,6 +107,9 @@ Game::run()
 {
 	while (!exit) {
 		// TODO: implementar bucle del juego
+		render();
+		update();
+		handleEvents();
 	}
 }
 
@@ -108,9 +122,21 @@ Game::handleEvents()
 	while (SDL_PollEvent(&event)) {
 		if (event.type == SDL_EVENT_QUIT)
 			exit = true;
+		bowPtr->handleEvent(event);
 
 		// TODO
 	}
+}
+
+void 
+Game::generateBalloon() {
+	int color = uniform_int_distribution<int>(0, 6)(random);
+	int posX = uniform_int_distribution<int>(100, 700)(random);
+	//cuando hagamos el moviemiento cambiamos 400 por 600
+	Rectangle rect(Point2D<>(posX, 400), 100, 100);
+
+	balloons.push_back(new balloon(rect, Vector2D<>(0, 10), textures[BALLOON], color));
+	cout << "generando globo" << endl;
 }
 
 // bool

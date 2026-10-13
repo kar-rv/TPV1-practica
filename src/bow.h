@@ -12,7 +12,6 @@ private:
 	Vector2D<> vel;
 	int numFlechas;
 	bool armado;
-	void handleEvent(const SDL_Event& event);
 
 	Texture* textura;
 
@@ -21,5 +20,6 @@ public:
 	~bow();
 	void render() const;
 	bool update(float delta);
+	void handleEvent(const SDL_Event& event);
 };
 

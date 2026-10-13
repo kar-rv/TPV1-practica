@@ -1,4 +1,5 @@
 #include "bow.h"
+#include "game.h"
 #include "texture.h"
 #include <SDL3/SDL_render.h>
 bow::bow(Rectangle posDim, Vector2D<> vel, Texture* textura, int numFlechas, bool armado) : 
@@ -15,8 +16,6 @@ bow::render() const {
 		// Convertimos el Rectangle a SDL_FRect usando to_sdl()
 		SDL_FRect destRect = posDim.to_sdl();
 
-		// Como tu textura del arco tiene 1 fila y 2 columnas (según textureList), 
-		// puedes renderizar la columna 0 (por ejemplo, el arco sin armar o normal)
 		textura->renderFrame(destRect, 0, 0);
 	}
 }
@@ -24,4 +23,18 @@ bow::render() const {
 bool
 bow::update(float delta) {
 	return false;
+}
+
+void
+bow::handleEvent(const SDL_Event& event) {
+	if (event.key.key == SDLK_DOWN) {
+		if (posDim.getTopLeftCorner().getY() + posDim.getHeight() < 600)
+			posDim.move(vel);
+	}
+
+	else if (event.key.key == SDLK_UP) {
+		if(posDim.getTopLeftCorner().getY() >= 1)
+		posDim.move(Vector2D<>(-vel.getX(), -vel.getY()));
+	}
+	
 }

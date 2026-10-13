@@ -6,6 +6,7 @@
 #include <istream>
 #include <vector>
 #include "rectangle.h"
+#include <random>
 
 // Declaraciones anticipadas
 class Texture;
@@ -45,6 +46,7 @@ private:
 	void update();
 	void handleEvents();
 	void checkCollision();
+	void generateBalloon();
 
 	bool exit;
 
@@ -53,6 +55,8 @@ private:
 	std::vector<arrow*> arrows;
 	std::vector<balloon*> balloons;
 	bow* bowPtr;
+
+	std::mt19937_64 random;
 
 public:
 	Game();

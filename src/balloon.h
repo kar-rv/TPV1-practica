@@ -15,7 +15,7 @@ private:
 	Texture* textura;
 
 public:
-	balloon(Rectangle posDim, Vector2D<>vel, int color);
+	balloon(Rectangle posDim, Vector2D<>vel, Texture* textura, int color);
 	~balloon();
 
 	void render() const;
