@@ -17,6 +17,8 @@ private:
 	Texture* textura;
 
 public:
+	bow(Rectangle posDim, Vector2D<> vel, Texture* textura, int numFlechas, bool armado = false);
+	~bow();
 	void render() const;
 	bool update(float delta);
 };

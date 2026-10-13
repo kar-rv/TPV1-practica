@@ -32,6 +32,7 @@ public:
 		BOW = 0,
 		ARROW,
 		BALLOON,
+		BACKGROUND,
 		NUM_TEXTURES
 	};
 
@@ -51,7 +52,7 @@ private:
 	// TODO: añadir atributos para los objetos del juego
 	std::vector<arrow*> arrows;
 	std::vector<balloon*> balloons;
-	bow* bow;
+	bow* bowPtr;
 
 public:
 	Game();

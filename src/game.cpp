@@ -5,6 +5,8 @@
 #include <SDL3_image/SDL_image.h>
 
 #include "texture.h"
+#include "bow.h"
+#include "rectangle.h"
 
 using namespace std;
 
@@ -23,9 +25,11 @@ struct TextureSpec
 };
 
 constexpr array<TextureSpec, Game::NUM_TEXTURES> textureList{
+	
 	TextureSpec{"bow.png", 1, 2},
 	TextureSpec{"arrow.png"},
-	TextureSpec{"balloons.png", 1, 1}
+	TextureSpec{"balloons.png", 1, 1},
+	TextureSpec{"background1.png"}
 };
 
 Game::Game()
@@ -59,6 +63,8 @@ Game::Game()
 	// SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
 
 	// TODO: crear los objetos del juego
+	Rectangle rect(Point2D<>(0, 0), 100, 100);
+	bowPtr = new bow(rect, Vector2D<>(0, 0), textures[BOW], 10);
 }
 
 Game::~Game()
@@ -72,6 +78,9 @@ Game::render() const
 	SDL_RenderClear(renderer);
 
 	// TODO
+	textures[BACKGROUND]->render();
+	bowPtr->render();
+
 
 	SDL_RenderPresent(renderer);
 }

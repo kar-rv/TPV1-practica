@@ -15,6 +15,9 @@ private:
 	Texture* textura;
 
 public:
+	balloon(Rectangle posDim, Vector2D<>vel, int color);
+	~balloon();
+
 	void render() const;
 	bool update(float delta);
 };

@@ -15,6 +15,8 @@ private:
 	Texture* textura;
 
 public:
+	arrow(Rectangle posDim, Vector2D<>vel);
+	~arrow();
 	void render() const;
 	bool update(float delta);
 };
