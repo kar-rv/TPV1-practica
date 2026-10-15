@@ -43,12 +43,13 @@ private:
 	std::array<Texture*, NUM_TEXTURES> textures;
 
 	void render() const;
-	void update();
+	void update(float delta);
 	void handleEvents();
 	void checkCollision();
 	void generateBalloon();
 
 	bool exit;
+	Uint64 lastTime;
 
 	// Elemento del juego
 	// TODO: añadir atributos para los objetos del juego

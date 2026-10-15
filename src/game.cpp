@@ -29,7 +29,7 @@ constexpr array<TextureSpec, Game::NUM_TEXTURES> textureList{
 	
 	TextureSpec{"bow.png", 1, 2},
 	TextureSpec{"arrow.png"},
-	TextureSpec{"balloons.png", 1, 1},
+	TextureSpec{"balloons.png", 7, 6},
 	TextureSpec{"background1.png"}
 };
 
@@ -82,6 +82,7 @@ Game::render() const
 	textures[BACKGROUND]->render(); // Llama al método de Texture que dibuja a pantalla completa
 	
 	bowPtr->render();
+
 	for (auto b : balloons) {
 		b->render();
 	}
@@ -90,16 +91,31 @@ Game::render() const
 }
 
 void
-Game::update()
+Game::update(float delta)
 {
-	// TODO
-	int contador = 0;
-	if (contador < 15) {
+	// temporizador para generar globos
+	static float timeSinceLastSpawn = 0.0f;
+	timeSinceLastSpawn += delta;
+
+	// generar un globo cada 2
+	if (timeSinceLastSpawn > 2.0f) {
 		generateBalloon();
-		contador = 0;
+		timeSinceLastSpawn = 0.0f;
 	}
-	else
-		contador += 1;
+
+	// actualizamos los glovos y los eliminamos si es necesario
+	auto b = balloons.begin();
+	while (b != balloons.end()) {
+		// *b nos da el puntero al balloon actual
+		if ((*b)->update(delta)) {
+			delete* b;
+			b = balloons.erase(b);
+			cout << "borrando globo" << endl;
+		}
+		// si sigue vivo, avanzamos al siguiente
+		else 
+			++b;
+	}
 }
 
 void
@@ -107,8 +123,16 @@ Game::run()
 {
 	while (!exit) {
 		// TODO: implementar bucle del juego
+		// Calcular el Delta Time en segundos
+		Uint64 currentTime = SDL_GetTicks();
+		float delta = (currentTime - lastTime) / 1000.0f; // Pasamos milisegundos a segundos
+		lastTime = currentTime;
+
+		// Limitar el delta por seguridad si la ventana se arrastra o se congela
+		if (delta > 0.1f) delta = 0.1f;
+
 		render();
-		update();
+		update(delta);
 		handleEvents();
 	}
 }
@@ -130,13 +154,39 @@ Game::handleEvents()
 
 void 
 Game::generateBalloon() {
+	// valores random
 	int color = uniform_int_distribution<int>(0, 6)(random);
 	int posX = uniform_int_distribution<int>(100, 700)(random);
-	//cuando hagamos el moviemiento cambiamos 400 por 600
-	Rectangle rect(Point2D<>(posX, 400), 100, 100);
+	float velY = uniform_int_distribution<int>(50, 200)(random);
+	Rectangle rect(Point2D<>(posX, 600), 100, 100);
 
-	balloons.push_back(new balloon(rect, Vector2D<>(0, 10), textures[BALLOON], color));
-	cout << "generando globo" << endl;
+	balloons.push_back(new balloon(rect, Vector2D<>(0, -velY), textures[BALLOON], color));
+
+	cout << "generando globo: ";
+	switch (color) {
+	case 0:
+		cout << "azul";
+			break;
+	case 1:
+		cout << "verde";
+		break;
+	case 2:
+		cout << "naranja";
+		break;
+	case 3:
+		cout << "rojo";
+		break;
+	case 4:
+		cout << "amarillo";
+		break;
+	case 5:
+		cout << "rosa";
+		break;
+	case 6:
+		cout << "morado";
+		break;
+	}
+	cout << "  y vel: " << velY << endl;
 }
 
 // bool

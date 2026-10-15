@@ -22,5 +22,11 @@ balloon::render() const {
 
 bool
 balloon::update(float delta) {
+	//si se sale de la pantalla devolvemos true
+	if (posDim.getTopLeftCorner().getY() + posDim.getHeight() < 0)
+		return true;
+
+	//movemos el glovo hacia ariba
+	posDim.move(Vector2D<>(0, vel.getY() * delta));
 	return false;
 }
