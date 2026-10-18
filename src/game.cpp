@@ -1,5 +1,5 @@
 #include "game.h"
-
+#include <iostream>
 #include <string>
 
 #include <SDL3_image/SDL_image.h>
@@ -8,6 +8,7 @@
 #include "bow.h"
 #include "balloon.h"
 #include "rectangle.h"
+#include "arrow.h"
 
 using namespace std;
 
@@ -65,7 +66,7 @@ Game::Game()
 
 	// TODO: crear los objetos del juego
 	Rectangle rect(Point2D<>(25, 100), 100, 100);
-	bowPtr = new bow(rect, Vector2D<>(0, 10), textures[BOW], 10);
+	bowPtr = new bow(rect, Vector2D<>(0, 10), textures[BOW], 10, false, this);
 }
 
 Game::~Game()
@@ -87,6 +88,9 @@ Game::render() const
 		b->render();
 	}
 
+	for (auto a : arrows)
+		a->render();
+
 	SDL_RenderPresent(renderer);
 }
 
@@ -94,13 +98,13 @@ void
 Game::update(float delta)
 {
 	// temporizador para generar globos
-	static float timeSinceLastSpawn = 0.0f;
-	timeSinceLastSpawn += delta;
+	static float timeSinceLastBalloonSpawn = 0.0f;
+	timeSinceLastBalloonSpawn += delta;
 
 	// generar un globo cada 2
-	if (timeSinceLastSpawn > 2.0f) {
+	if (timeSinceLastBalloonSpawn > 2.0f) {
 		generateBalloon();
-		timeSinceLastSpawn = 0.0f;
+		timeSinceLastBalloonSpawn = 0.0f;
 	}
 
 	// actualizamos los glovos y los eliminamos si es necesario
@@ -116,6 +120,17 @@ Game::update(float delta)
 		else 
 			++b;
 	}
+
+	// esto se me genera un poco a trompicones
+	for (auto a = arrows.begin(); a != arrows.end(); ) {
+		if (!(*a)->update(1.0)) {   // delta fijo de momento
+			delete* a;
+			a = arrows.erase(a);
+		}
+		else ++a;
+	}
+	
+
 }
 
 void
@@ -134,6 +149,11 @@ Game::run()
 		render();
 		update(delta);
 		handleEvents();
+
+		// se espera lo que falte hasta completar el periodo del frame
+		Uint64 elapsed = SDL_GetTicks() - currentTime;
+		if (elapsed < FRAME_PERIOD)
+			SDL_Delay(FRAME_PERIOD - elapsed);
 	}
 }
 
@@ -187,6 +207,15 @@ Game::generateBalloon() {
 		break;
 	}
 	cout << "  y vel: " << velY << endl;
+}
+
+void
+Game::generateArrow(const Point2D<>& pos) {
+	Texture* arrowTexture = textures[ARROW];
+	float arrowHeight = 100 / arrowTexture->getAspectRatio();
+	Rectangle rect(pos, 100, arrowHeight);
+	arrows.push_back(new arrow(rect, Vector2D<>(10, 0), arrowTexture));
+	cout << "generando flecha" << endl;
 }
 
 // bool

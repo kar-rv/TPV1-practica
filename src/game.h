@@ -6,6 +6,7 @@
 #include <istream>
 #include <vector>
 #include "rectangle.h"
+#include "arrow.h"
 #include <random>
 
 // Declaraciones anticipadas
@@ -71,6 +72,7 @@ public:
 
 	// Comprueba si hay algún objeto colocado en ese rectángulo
 	// bool checkCollision(const Rectangle& rect);
+	void generateArrow(const Point2D<>& pos);
 };
 
 inline Texture*
