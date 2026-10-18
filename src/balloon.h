@@ -14,6 +14,11 @@ private:
 
 	Texture* textura;
 
+	int ancho;
+	int alto;
+	int filas;
+	int columnas;
+
 public:
 	balloon(Rectangle posDim, Vector2D<>vel, Texture* textura, int color);
 	~balloon();
