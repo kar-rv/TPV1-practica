@@ -4,19 +4,19 @@
 #include "vector2D.h"
 
 class Texture;
-// class game;
+class Game;
 
 class arrow
 {
 private:
-	// Game* game;
+	Game* game;
 	Rectangle posDim;
 	Vector2D<> vel;
 
 	Texture* textura;
 
 public:
-	arrow(Rectangle posDim, Vector2D<>vel, Texture* textura);  // falta Game* game
+	arrow(Rectangle posDim, Vector2D<>vel, Texture* textura, Game* game = nullptr);
 	~arrow();
 	void render() const;
 	bool update(float delta);

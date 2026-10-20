@@ -46,7 +46,6 @@ private:
 	void render() const;
 	void update(float delta);
 	void handleEvents();
-	void checkCollision();
 	void generateBalloon();
 
 	bool exit;
@@ -71,7 +70,7 @@ public:
 	void run();
 
 	// Comprueba si hay algún objeto colocado en ese rectángulo
-	// bool checkCollision(const Rectangle& rect);
+	bool checkCollision(const Rectangle& rect, float delta);
 	void generateArrow(const Point2D<>& pos);
 };
 

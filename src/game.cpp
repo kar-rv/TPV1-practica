@@ -218,13 +218,20 @@ Game::generateArrow(const Point2D<>& pos) {
 	Texture* arrowTexture = textures[ARROW];
 	float arrowHeight = 100 / arrowTexture->getAspectRatio();
 	Rectangle rect(pos, 100, arrowHeight);
-	arrows.push_back(new arrow(rect, Vector2D<>(300, 0), arrowTexture));
+	arrows.push_back(new arrow(rect, Vector2D<>(300, 0), arrowTexture, this));
 	cout << "generando flecha" << endl;
 }
 
-// bool
-// Game::checkCollision(const Rectangle& rect)
-// {
-//	// TODO
-//	return false;
-// }
+ bool
+ Game::checkCollision(const Rectangle& rect, float delta)
+ {
+	 bool colision = false;
+	 for (auto b = balloons.begin(); b != balloons.end(); ) {
+		 if ((*b)->hit(rect)) {
+			colision = true;
+		 }
+		 else ++b;
+	 }
+
+	return colision;
+ }

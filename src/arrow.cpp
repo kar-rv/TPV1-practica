@@ -1,8 +1,11 @@
 #include "arrow.h"
 #include "texture.h"
+#include "game.h"
 
-arrow::arrow(Rectangle posDim, Vector2D<> vel, Texture* textura) :
-	posDim(posDim), vel(vel), textura(textura) {
+using namespace std;
+
+arrow::arrow(Rectangle posDim, Vector2D<> vel, Texture* textura, Game* game) :
+	posDim(posDim), vel(vel), textura(textura), game(game) {
 
 }
 
@@ -23,5 +26,7 @@ bool
 arrow::update(float delta) {
 	posDim.move(Vector2D<>(vel.getX() * delta, vel.getY() * delta));
 	// false -> se elimina cuando sale por la derecha
+	Rectangle rect(Point2D<>(posDim.getTopLeftCorner().getX() + 60, posDim.getTopLeftCorner().getY()), 5, 5);
+	game->checkCollision(rect, delta);
 	return posDim.getTopLeftCorner().getX() < Game::WINDOW_WIDTH;
 }

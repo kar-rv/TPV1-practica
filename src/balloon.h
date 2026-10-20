@@ -9,8 +9,10 @@ class balloon
 private:
 	Rectangle posDim;
 	int color;
+	bool dead = false;
 	Vector2D<> vel;
-	bool hit(const Rectangle& obj);
+	float animationTimer = 0.0f;
+	int row = 1;
 
 	Texture* textura;
 
@@ -25,5 +27,7 @@ public:
 
 	void render() const;
 	bool update(float delta);
+	bool hit(const Rectangle& obj);
+	bool animate(float delta);
 };
 
