@@ -43,11 +43,13 @@ bow::handleEvent(const SDL_Event& event) {
 
 	else if (event.key.key == SDLK_UP) {
 		if(posDim.getTopLeftCorner().getY() >= 1)
-		posDim.move(Vector2D<>(-vel.getX(), -vel.getY()));
+			posDim.move(Vector2D<>(-vel.getX(), -vel.getY()));
 	}
 
 	else if (event.key.key == SDLK_LEFT) {
-		armado = true;  // cargar flecha
+		if (numFlechas > 0) {
+			armado = true;  // cargar flecha
+		}
 		cout << "armado" << endl;
 	}
 

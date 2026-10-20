@@ -72,6 +72,14 @@ Game::Game()
 Game::~Game()
 {
 	// TODO: liberar la memoria reservada por la clase
+	for (arrow* arrow : arrows) delete arrow;
+	for (balloon* balloon : balloons) delete balloon;
+	for (Texture* texture : textures) delete texture;
+	delete bowPtr;
+
+	SDL_DestroyRenderer(renderer);
+	SDL_DestroyWindow(window);
+	SDL_Quit();
 }
 
 void
