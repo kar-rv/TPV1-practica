@@ -223,7 +223,7 @@ Game::generateArrow(const Point2D<>& pos) {
 }
 
  bool
- Game::checkCollision(const Rectangle& rect, float delta)
+ Game::checkCollision(const Rectangle& rect)
  {
 	 bool colision = false;
 	 for (auto b = balloons.begin(); b != balloons.end(); ) {

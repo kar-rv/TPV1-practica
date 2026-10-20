@@ -70,7 +70,7 @@ public:
 	void run();
 
 	// Comprueba si hay algún objeto colocado en ese rectángulo
-	bool checkCollision(const Rectangle& rect, float delta);
+	bool checkCollision(const Rectangle& rect);
 	void generateArrow(const Point2D<>& pos);
 };
 

@@ -18,7 +18,7 @@ balloon::render() const {
 		// Convertimos el Rectangle a SDL_FRect usando to_sdl()
 		SDL_FRect destRect = posDim.to_sdl();
 
-		textura->renderFrame(destRect, color, 0);
+		textura->renderFrame(destRect, color, row);
 	}
 }
 
@@ -29,47 +29,30 @@ balloon::update(float delta) {
 		return true;
 
 	//movemos el glovo hacia ariba
-	posDim.move(Vector2D<>(0, vel.getY() * delta));
 
 	if (dead) {
 		SDL_FRect destRect = posDim.to_sdl();
-		cout << "empieza animacion" << endl;
 		animationTimer += delta;
-		if (animationTimer > 1.0f) {
-			textura->renderFrame(destRect, row, color);
-			cout << "bucleee" << endl;
+		if (animationTimer > 0.05f) {
 			row++;
 			animationTimer = 0.0f;
 		}
-		return true;
+		if (row > 6) {
+			return true;
+		}
 	}
+	else
+		posDim.move(Vector2D<>(0, vel.getY() * delta));
+
 	return false;
 }
 
 bool
 balloon::hit(const Rectangle& obj) {
-	if (posDim.hasIntersection(obj)) {
+	if (!dead && posDim.hasIntersection(obj)) {
+		row = 1;
 		dead = true;
 		return true;
 	}
 	return false;
-}
-
-bool
-balloon::animate(float delta) {
-	SDL_FRect destRect = posDim.to_sdl();
-	cout << "empieza animacion" << endl;
-	static float animationTimer = 0.0f;
-
-	int row = 1;
-	while (row < 6) {
-		animationTimer += delta;
-		if (animationTimer > 10.0f) {
-			textura->renderFrame(destRect, row, color);
-			cout << "bucleee" << endl;
-			row++;
-			animationTimer = 0.0f;
-		}
-	}
-	return true;
 }

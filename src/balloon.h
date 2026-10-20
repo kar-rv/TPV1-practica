@@ -12,7 +12,7 @@ private:
 	bool dead = false;
 	Vector2D<> vel;
 	float animationTimer = 0.0f;
-	int row = 1;
+	int row = 0;
 
 	Texture* textura;
 

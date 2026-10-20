@@ -27,6 +27,6 @@ arrow::update(float delta) {
 	posDim.move(Vector2D<>(vel.getX() * delta, vel.getY() * delta));
 	// false -> se elimina cuando sale por la derecha
 	Rectangle rect(Point2D<>(posDim.getTopLeftCorner().getX() + 60, posDim.getTopLeftCorner().getY()), 5, 5);
-	game->checkCollision(rect, delta);
+	game->checkCollision(rect);
 	return posDim.getTopLeftCorner().getX() < Game::WINDOW_WIDTH;
 }
