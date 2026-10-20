@@ -116,22 +116,18 @@ Game::update(float delta)
 	}
 
 	// actualizamos los glovos y los eliminamos si es necesario
-	auto b = balloons.begin();
-	while (b != balloons.end()) {
-		// *b nos da el puntero al balloon actual
+	for (auto b = balloons.begin(); b != balloons.end(); ) {
 		if ((*b)->update(delta)) {
 			delete* b;
 			b = balloons.erase(b);
 			cout << "borrando globo" << endl;
 		}
-		// si sigue vivo, avanzamos al siguiente
-		else 
-			++b;
+		else ++b;
 	}
 
-	// esto se me genera un poco a trompicones
+	// actualizamos las flechas tambien
 	for (auto a = arrows.begin(); a != arrows.end(); ) {
-		if (!(*a)->update(1.0)) {   // delta fijo de momento
+		if (!(*a)->update(delta)) {
 			delete* a;
 			a = arrows.erase(a);
 		}
@@ -222,7 +218,7 @@ Game::generateArrow(const Point2D<>& pos) {
 	Texture* arrowTexture = textures[ARROW];
 	float arrowHeight = 100 / arrowTexture->getAspectRatio();
 	Rectangle rect(pos, 100, arrowHeight);
-	arrows.push_back(new arrow(rect, Vector2D<>(10, 0), arrowTexture));
+	arrows.push_back(new arrow(rect, Vector2D<>(300, 0), arrowTexture));
 	cout << "generando flecha" << endl;
 }
 
