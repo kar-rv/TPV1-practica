@@ -11,6 +11,7 @@
 #include "balloon.h"
 #include "rectangle.h"
 #include "arrow.h"
+#include "infobar.h"
 
 using namespace std;
 
@@ -87,6 +88,7 @@ Game::Game()
 	// TODO: crear los objetos del juego
 	Rectangle rect(Point2D<>(25, 100), 100, 100);
 	bowPtr = new bow(rect, Vector2D<>(0, 10), textures[BOW], numArrows, false, this);
+	infoBarPtr = new infoBar(renderer, textures[ARROW]);
 }
 
 Game::~Game()
@@ -96,6 +98,7 @@ Game::~Game()
 	for (balloon* balloon : balloons) delete balloon;
 	for (Texture* texture : textures) delete texture;
 	delete bowPtr;
+	delete infoBarPtr;
 
 	SDL_DestroyRenderer(renderer);
 	SDL_DestroyWindow(window);
@@ -121,6 +124,9 @@ Game::render() const
 	// se renderizan las flechas
 	for (auto a : arrows)
 		a->render();
+
+	// se renderiza la barra de información
+	infoBarPtr->render(bowPtr->getNumFlechas(), score);
 
 	// se llama al renderer
 	SDL_RenderPresent(renderer);
@@ -261,6 +267,7 @@ Game::generateArrow(const Point2D<>& pos) {
 		 // si un globo ha colisionado con una flecha se marca que ha habido colision
 		 if ((*b)->hit(rect)) {
 			colision = true;
+			score += 10;
 		 }
 		 else ++b;
 	 }

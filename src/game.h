@@ -14,6 +14,7 @@ class Texture;
 class arrow;
 class balloon;
 class bow;
+class infoBar;
 
 /**
  * Clase principal del juego.
@@ -57,11 +58,13 @@ private:
 	std::vector<arrow*> arrows;
 	std::vector<balloon*> balloons;
 	bow* bowPtr;
+	infoBar* infoBarPtr;
 
 	std::mt19937_64 random;
 
-	int numArrows;
-	float balloonDelay;
+	int numArrows = 10;
+	float balloonDelay = 2.0f;
+	int score = 0;
 
 public:
 	Game();
@@ -76,6 +79,10 @@ public:
 	// Comprueba si hay algún objeto colocado en ese rectángulo
 	bool checkCollision(const Rectangle& rect);
 	void generateArrow(const Point2D<>& pos);
+
+	int getScore() const {
+		return score;
+	}
 };
 
 inline Texture*
@@ -83,5 +90,4 @@ Game::getTexture(TextureName name) const
 {
 	return textures[name];
 }
-
 #endif // GAME_H

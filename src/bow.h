@@ -25,5 +25,9 @@ public:
 	void render() const;
 	bool update(float delta);
 	void handleEvent(const SDL_Event& event);
+
+	int getNumFlechas() const {
+		return numFlechas;
+	}
 };
 
