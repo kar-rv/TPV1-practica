@@ -1,6 +1,8 @@
 #include "game.h"
 #include <iostream>
+#include <fstream>
 #include <string>
+#include <limits>
 
 #include <SDL3_image/SDL_image.h>
 
@@ -37,6 +39,24 @@ constexpr array<TextureSpec, Game::NUM_TEXTURES> textureList{
 Game::Game()
   : exit(false), random(time(nullptr))
 {
+	// carga el archivo de niveles
+	int lvl = 0;
+	do {
+		cout << "¿Level 1 or 2?" << '\n';
+		cin >> lvl;
+	} while (lvl != 1 && lvl != 2);
+	string route = LEVEL_ROOT + to_string(lvl) + ".txt";
+
+	try {
+		if (!loadLevel(route)) {  // este método devuelve true si se ha podido cargar el nivel y false si no
+			numArrows = 10;
+			balloonDelay = 2.0f;
+		}
+	}
+	catch (...) {
+		throw;
+	}
+
 	// Carga SDL y crea la ventana con su renderizador
 	if (!SDL_Init(SDL_INIT_VIDEO))
 		throw "SDL_Init: "s + SDL_GetError();
@@ -66,12 +86,12 @@ Game::Game()
 
 	// TODO: crear los objetos del juego
 	Rectangle rect(Point2D<>(25, 100), 100, 100);
-	bowPtr = new bow(rect, Vector2D<>(0, 10), textures[BOW], 10, false, this);
+	bowPtr = new bow(rect, Vector2D<>(0, 10), textures[BOW], numArrows, false, this);
 }
 
 Game::~Game()
 {
-	// TODO: liberar la memoria reservada por la clase
+	// se libera la memoria de todos los objetos
 	for (arrow* arrow : arrows) delete arrow;
 	for (balloon* balloon : balloons) delete balloon;
 	for (Texture* texture : textures) delete texture;
@@ -90,15 +110,19 @@ Game::render() const
 	// TODO
 	textures[BACKGROUND]->render(); // Llama al método de Texture que dibuja a pantalla completa
 	
+	// se renderiza el arco
 	bowPtr->render();
 
+	// se renderizan los globos
 	for (auto b : balloons) {
 		b->render();
 	}
 
+	// se renderizan las flechas
 	for (auto a : arrows)
 		a->render();
 
+	// se llama al renderer
 	SDL_RenderPresent(renderer);
 }
 
@@ -110,7 +134,7 @@ Game::update(float delta)
 	timeSinceLastBalloonSpawn += delta;
 
 	// generar un globo cada 2
-	if (timeSinceLastBalloonSpawn > 2.0f) {
+	if (timeSinceLastBalloonSpawn > balloonDelay) {
 		generateBalloon();
 		timeSinceLastBalloonSpawn = 0.0f;
 	}
@@ -142,12 +166,12 @@ Game::run()
 {
 	while (!exit) {
 		// TODO: implementar bucle del juego
-		// Calcular el Delta Time en segundos
+		// calcular el Delta Time en segundos
 		Uint64 currentTime = SDL_GetTicks();
 		float delta = (currentTime - lastTime) / 1000.0f; // Pasamos milisegundos a segundos
 		lastTime = currentTime;
 
-		// Limitar el delta por seguridad si la ventana se arrastra o se congela
+		// se limita el delta por si la ventana se arrastra o se congela
 		if (delta > 0.1f) delta = 0.1f;
 
 		render();
@@ -180,12 +204,14 @@ void
 Game::generateBalloon() {
 	// valores random
 	int color = uniform_int_distribution<int>(0, 6)(random);
-	int posX = uniform_int_distribution<int>(100, 700)(random);
+	int posX = uniform_int_distribution<int>(200, 700)(random);
 	float velY = uniform_int_distribution<int>(50, 200)(random);
 	Rectangle rect(Point2D<>(posX, 600), 100, 100);
 
+	// se genera el globo con los valores random
 	balloons.push_back(new balloon(rect, Vector2D<>(0, -velY), textures[BALLOON], color));
 
+	// este switch es solo para debug
 	cout << "generando globo: ";
 	switch (color) {
 	case 0:
@@ -216,8 +242,12 @@ Game::generateBalloon() {
 void
 Game::generateArrow(const Point2D<>& pos) {
 	Texture* arrowTexture = textures[ARROW];
+
+	// esto es para que el arrow se genere en mitad del arco y no en la esquina de arriba
 	float arrowHeight = 100 / arrowTexture->getAspectRatio();
 	Rectangle rect(pos, 100, arrowHeight);
+
+	// se genera la flecha
 	arrows.push_back(new arrow(rect, Vector2D<>(300, 0), arrowTexture, this));
 	cout << "generando flecha" << endl;
 }
@@ -226,7 +256,9 @@ Game::generateArrow(const Point2D<>& pos) {
  Game::checkCollision(const Rectangle& rect)
  {
 	 bool colision = false;
+	 // se recorre el array de globos
 	 for (auto b = balloons.begin(); b != balloons.end(); ) {
+		 // si un globo ha colisionado con una flecha se marca que ha habido colision
 		 if ((*b)->hit(rect)) {
 			colision = true;
 		 }
@@ -234,4 +266,31 @@ Game::generateArrow(const Point2D<>& pos) {
 	 }
 
 	return colision;
+ }
+
+ bool
+ Game::loadLevel(string route)
+ {
+	 ifstream levels(route);
+	 if (!levels.is_open()) {
+		 // cerr es como cout pero se utiliza cuando se escribe un mensaje de error (aunque funcionan igual)
+		 cerr << "No se pudo abrir el archivo con ruta " << route << '\n';
+		 return false;
+	 }
+
+	 string word;
+	 while (levels >> word) {
+		 if (word == "arrows") {
+			 levels >> numArrows;  // número de flechas
+		 }
+		 else if (word == "baldelay") {
+			 levels >> balloonDelay;  // delay del globo
+			 balloonDelay = balloonDelay / 1000.0f;  // se pasan milisegundos a segundos
+		 }
+		 else {
+			 // si es cualquier otra palabra se ignora
+			 levels.ignore(numeric_limits<streamsize>::max(), '\n');
+		 }
+	 }
+	 return true;
  }

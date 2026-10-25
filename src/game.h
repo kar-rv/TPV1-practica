@@ -47,6 +47,7 @@ private:
 	void update(float delta);
 	void handleEvents();
 	void generateBalloon();
+	bool loadLevel(std::string route);
 
 	bool exit;
 	Uint64 lastTime;
@@ -58,6 +59,9 @@ private:
 	bow* bowPtr;
 
 	std::mt19937_64 random;
+
+	int numArrows;
+	float balloonDelay;
 
 public:
 	Game();

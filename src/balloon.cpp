@@ -15,7 +15,7 @@ balloon::~balloon() {
 void
 balloon::render() const {
 	if (textura != nullptr) {
-		// Convertimos el Rectangle a SDL_FRect usando to_sdl()
+		// convertimos el Rectangle a SDL_FRect usando to_sdl()
 		SDL_FRect destRect = posDim.to_sdl();
 
 		textura->renderFrame(destRect, color, row);
