@@ -1,4 +1,4 @@
-#include "infobar.h"
+#include "infoBar.h"
 #include "texture.h"
 #include "game.h"
 #include <string>

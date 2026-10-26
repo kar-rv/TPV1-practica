@@ -11,7 +11,7 @@
 #include "balloon.h"
 #include "rectangle.h"
 #include "arrow.h"
-#include "infobar.h"
+#include "infoBar.h"
 
 using namespace std;
 
@@ -50,12 +50,11 @@ Game::Game()
 
 	try {
 		if (!loadLevel(route)) {  // este método devuelve true si se ha podido cargar el nivel y false si no
-			numArrows = 10;
-			balloonDelay = 2.0f;
+			throw "No se ha podido abrir el archivo de niveles";
 		}
 	}
-	catch (...) {
-		throw;
+	catch (const std::exception& e) {
+		std::cerr << "Excepcion capturada: " << e.what() << std::endl;
 	}
 
 	// Carga SDL y crea la ventana con su renderizador
@@ -110,7 +109,6 @@ Game::render() const
 {
 	SDL_RenderClear(renderer);
 
-	// TODO
 	textures[BACKGROUND]->render(); // Llama al método de Texture que dibuja a pantalla completa
 	
 	// se renderiza el arco
@@ -171,7 +169,6 @@ void
 Game::run()
 {
 	while (!exit) {
-		// TODO: implementar bucle del juego
 		// calcular el Delta Time en segundos
 		Uint64 currentTime = SDL_GetTicks();
 		float delta = (currentTime - lastTime) / 1000.0f; // Pasamos milisegundos a segundos
