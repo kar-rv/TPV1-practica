@@ -65,20 +65,24 @@ Game::Game()
 	                                 WINDOW_WIDTH, WINDOW_HEIGHT,
 	                                 0, &window, &renderer))
 		throw "window or renderer: "s + SDL_GetError();
-
+	size_t i = 0;
 	// Carga las texturas al inicio
 	try {
 		textures.fill(nullptr);
 		string imgRoot = IMAGE_ROOT;
 
-		for (size_t i = 0; i < textures.size(); i++) {
+		for (i = 0; i < textures.size(); i++) {
 			auto [name, nrows, ncols] = textureList[i];
 			textures[i] = new Texture(renderer, (imgRoot + name).c_str(), nrows, ncols);
 		}
 	}
 	catch (...) {
 		// TODO: liberar la memoria reservada
-		throw; // relanza la excepción
+		for (size_t j = 0; j < i; j++) {
+			delete textures[j];
+			textures[j] = nullptr;
+		}
+		throw "Error al cargar las texturas"s; // relanza la excepción
 	}
 
 	// Configura que se pueden utilizar capas translúcidas
@@ -278,7 +282,8 @@ Game::generateArrow(const Point2D<>& pos) {
 	 ifstream levels(route);
 	 if (!levels.is_open()) {
 		 // cerr es como cout pero se utiliza cuando se escribe un mensaje de error (aunque funcionan igual)
-		 cerr << "No se pudo abrir el archivo con ruta " << route << '\n';
+		 throw "Error: No se pudo abrir el archivo con ruta (" + route + ")"s;
+		 //cerr << "No se pudo abrir el archivo con ruta " << route << '\n';
 		 return false;
 	 }
 

@@ -6,15 +6,16 @@
 //
 
 #include "game.h"
+#include <string>
 
 int main(int argc, char* argv[])
 {
 	try {
 		Game().run();
 	}
-	catch (const std::exception& e) {
-		// devuelve mensaje explicativo sobre el error capturado
-		std::cerr << "Excepcion capturada: " << e.what() << std::endl;
+	catch (const std::string& e) {
+		std::cerr << "Excepcion capturada: " << e << std::endl;
+		return 1;
 	}
 	return 0;
 }
