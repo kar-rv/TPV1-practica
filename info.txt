@@ -1,0 +1,4 @@
+Grupo 09: Inés de la Peña Kures y Carmen Rosino Vílchez
+
+Funcionalidades opcionales:
+En la parte superior de la pantalla se muestran tanto las flechas restantes a la izquierda como la puntuación en la parte derecha.
