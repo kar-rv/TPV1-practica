@@ -7,7 +7,7 @@
 using namespace std;
 
 bow::bow(Rectangle posDim, Vector2D<> vel, Texture* textura, int numFlechas, bool armado, Game* game) : 
-	posDim(posDim), vel(vel), textura(textura), numFlechas(numFlechas), armado(armado), game(game) {
+	SceneObject(posDim, textura, game), vel(vel), numFlechas(numFlechas), armado(armado) {
 }
 
 bow::~bow() {

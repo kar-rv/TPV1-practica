@@ -3,8 +3,8 @@
 
 using namespace std;
 
-balloon::balloon(Rectangle posDim, Vector2D<> vel, Texture* textura, int color) : 
-	posDim(posDim), vel(vel), textura(textura), color(color) {
+balloon::balloon(Rectangle posDim, Vector2D<> vel, Texture* textura, int color, Game* game) : 
+	MobileObject(posDim,  textura, game, vel), color(color) {
 
 }
 

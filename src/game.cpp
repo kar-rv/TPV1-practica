@@ -53,8 +53,8 @@ Game::Game()
 			throw "No se ha podido abrir el archivo de niveles";
 		}
 	}
-	catch (const std::exception& e) {
-		std::cerr << "Excepcion capturada: " << e.what() << std::endl;
+	catch (const exception& e) {
+		cerr << "Excepcion capturada: " << e.what() << endl;
 	}
 
 	// Carga SDL y crea la ventana con su renderizador
@@ -216,7 +216,7 @@ Game::generateBalloon() {
 	Rectangle rect(Point2D<>(posX, 600), 100, 100);
 
 	// se genera el globo con los valores random
-	balloons.push_back(new balloon(rect, Vector2D<>(0, -velY), textures[BALLOON], color));
+	balloons.push_back(new balloon(rect, Vector2D<>(0, -velY), textures[BALLOON], color, this));
 
 	// este switch es solo para debug
 	cout << "generando globo: ";
@@ -255,7 +255,7 @@ Game::generateArrow(const Point2D<>& pos) {
 	Rectangle rect(pos, 100, arrowHeight);
 
 	// se genera la flecha
-	arrows.push_back(new arrow(rect, Vector2D<>(300, 0), arrowTexture, this));
+	arrows.push_back(new arrow(rect, arrowTexture, this, Vector2D<>(300, 0)));
 	cout << "generando flecha" << endl;
 }
 
