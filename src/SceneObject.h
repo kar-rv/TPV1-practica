@@ -14,5 +14,6 @@ protected:
 public:
 	SceneObject(Rectangle posDim, Texture* textura, Game* game);
 	virtual bool hit(const Rectangle&);
+	virtual void render() const override;
 };
 

@@ -8,6 +8,7 @@ MobileObject::MobileObject(Rectangle posDim, Texture* textura, Game* game, Vecto
 
 bool
 MobileObject::update(float delta) {
+
 	return false;
 }
 

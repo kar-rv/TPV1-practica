@@ -12,6 +12,7 @@
 #include "rectangle.h"
 #include "arrow.h"
 #include "infoBar.h"
+#include "Butterfly.h"
 
 using namespace std;
 
@@ -34,6 +35,7 @@ constexpr array<TextureSpec, Game::NUM_TEXTURES> textureList{
 	TextureSpec{"bow.png", 1, 2},
 	TextureSpec{"arrow.png"},
 	TextureSpec{"balloons.png", 7, 6},
+	TextureSpec{"butterfly.png"},
 	TextureSpec{"background1.png"}
 };
 
@@ -48,13 +50,8 @@ Game::Game()
 	} while (lvl != 1 && lvl != 2);
 	string route = LEVEL_ROOT + to_string(lvl) + ".txt";
 
-	try {
-		if (!loadLevel(route)) {  // este método devuelve true si se ha podido cargar el nivel y false si no
-			throw "No se ha podido abrir el archivo de niveles";
-		}
-	}
-	catch (const exception& e) {
-		cerr << "Excepcion capturada: " << e.what() << endl;
+	if (!loadLevel(route)) {  // este método devuelve true si se ha podido cargar el nivel y false si no
+		throw "No se ha podido abrir el archivo de niveles";
 	}
 
 	// Carga SDL y crea la ventana con su renderizador
@@ -91,15 +88,17 @@ Game::Game()
 	// TODO: crear los objetos del juego
 	Rectangle rect(Point2D<>(25, 100), 100, 100);
 	bowPtr = new bow(rect, Vector2D<>(0, 10), textures[BOW], numArrows, false, this);
-	infoBarPtr = new infoBar(renderer, textures[ARROW]);
+	infoBarPtr = new infoBar(renderer, textures[ARROW], this);
+
+	generarButterflies();
 }
 
 Game::~Game()
 {
 	// se libera la memoria de todos los objetos
-	for (arrow* arrow : arrows) delete arrow;
-	for (balloon* balloon : balloons) delete balloon;
+	for (GameObject* object : objects) delete object;
 	for (Texture* texture : textures) delete texture;
+
 	delete bowPtr;
 	delete infoBarPtr;
 
@@ -115,20 +114,13 @@ Game::render() const
 
 	textures[BACKGROUND]->render(); // Llama al método de Texture que dibuja a pantalla completa
 	
-	// se renderiza el arco
 	bowPtr->render();
-
 	// se renderizan los globos
-	for (auto b : balloons) {
-		b->render();
+	for (auto object : objects) {
+		object->render();
 	}
 
-	// se renderizan las flechas
-	for (auto a : arrows)
-		a->render();
-
-	// se renderiza la barra de información
-	infoBarPtr->render(bowPtr->getNumFlechas(), score);
+	infoBarPtr->render();
 
 	// se llama al renderer
 	SDL_RenderPresent(renderer);
@@ -147,26 +139,17 @@ Game::update(float delta)
 		timeSinceLastBalloonSpawn = 0.0f;
 	}
 
-	// actualizamos los glovos y los eliminamos si es necesario
-	for (auto b = balloons.begin(); b != balloons.end(); ) {
-		if ((*b)->update(delta)) {
-			delete* b;
-			b = balloons.erase(b);
+	infoBarPtr->update(delta);
+	bowPtr->update(delta);
+	// actualizamos los objetos y los eliminamos si es necesario
+	for (auto object = objects.begin(); object != objects.end(); ) {
+		if ((*object)->update(delta)) {
+			delete* object;
+			object = objects.erase(object);
 			cout << "borrando globo" << endl;
 		}
-		else ++b;
+		else ++object;
 	}
-
-	// actualizamos las flechas tambien
-	for (auto a = arrows.begin(); a != arrows.end(); ) {
-		if (!(*a)->update(delta)) {
-			delete* a;
-			a = arrows.erase(a);
-		}
-		else ++a;
-	}
-	
-
 }
 
 void
@@ -216,34 +199,7 @@ Game::generateBalloon() {
 	Rectangle rect(Point2D<>(posX, 600), 100, 100);
 
 	// se genera el globo con los valores random
-	balloons.push_back(new balloon(rect, Vector2D<>(0, -velY), textures[BALLOON], color, this));
-
-	// este switch es solo para debug
-	cout << "generando globo: ";
-	switch (color) {
-	case 0:
-		cout << "azul";
-			break;
-	case 1:
-		cout << "verde";
-		break;
-	case 2:
-		cout << "naranja";
-		break;
-	case 3:
-		cout << "rojo";
-		break;
-	case 4:
-		cout << "amarillo";
-		break;
-	case 5:
-		cout << "rosa";
-		break;
-	case 6:
-		cout << "morado";
-		break;
-	}
-	cout << "  y vel: " << velY << endl;
+	objects.push_back(new balloon(rect, Vector2D<>(0, -velY), textures[BALLOON], color, this));
 }
 
 void
@@ -255,7 +211,7 @@ Game::generateArrow(const Point2D<>& pos) {
 	Rectangle rect(pos, 100, arrowHeight);
 
 	// se genera la flecha
-	arrows.push_back(new arrow(rect, arrowTexture, this, Vector2D<>(300, 0)));
+	objects.push_back(new arrow(rect, arrowTexture, this, Vector2D<>(300, 0)));
 	cout << "generando flecha" << endl;
 }
 
@@ -264,13 +220,13 @@ Game::generateArrow(const Point2D<>& pos) {
  {
 	 bool colision = false;
 	 // se recorre el array de globos
-	 for (auto b = balloons.begin(); b != balloons.end(); ) {
+	 for (auto object = objects.begin(); object != objects.end(); ) {
 		 // si un globo ha colisionado con una flecha se marca que ha habido colision
-		 if ((*b)->hit(rect)) {
+		 if ((*object)->hit(rect)) {
 			colision = true;
 			score += 10;
 		 }
-		 else ++b;
+		 else ++object;
 	 }
 
 	return colision;
@@ -302,4 +258,17 @@ Game::generateArrow(const Point2D<>& pos) {
 		 }
 	 }
 	 return true;
+ }
+
+ void
+Game::generarButterflies() {
+	 for (int i = 0; i < numButterflies; i++) {
+		 int posX = uniform_int_distribution<int>(0, WINDOW_WIDTH - 75)(random);
+		 int posY = uniform_int_distribution<int>(0, WINDOW_HEIGHT - 75)(random);
+		 float velX = uniform_int_distribution<int>(-200, 200)(random);
+		 float velY = uniform_int_distribution<int>(-200, 200)(random);
+
+		 Rectangle rect(Point2D<>(posX, posY), 75, 75);
+		 objects.push_back(new Butterfly(rect, Vector2D<>(velX, velY), textures[BUTTERFLY], this));
+	 }
  }

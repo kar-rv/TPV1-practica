@@ -5,8 +5,10 @@
 #include <array>
 #include <istream>
 #include <vector>
+#include <list>
 #include "rectangle.h"
 #include "arrow.h"
+#include "SceneObject.h"
 #include <random>
 
 // Declaraciones anticipadas
@@ -35,6 +37,7 @@ public:
 		BOW = 0,
 		ARROW,
 		BALLOON,
+		BUTTERFLY,
 		BACKGROUND,
 		NUM_TEXTURES
 	};
@@ -49,20 +52,20 @@ private:
 	void handleEvents();
 	void generateBalloon();
 	bool loadLevel(std::string route);
+	void generarButterflies();
 
 	bool exit;
 	Uint64 lastTime;
 
 	// Elemento del juego
 	// TODO: añadir atributos para los objetos del juego
-	std::vector<arrow*> arrows;
-	std::vector<balloon*> balloons;
+	std::list<SceneObject*> objects;
 	bow* bowPtr;
 	infoBar* infoBarPtr;
-
 	std::mt19937_64 random;
 
 	int numArrows = 10;
+	int numButterflies = 10;
 	float balloonDelay = 2.0f;
 	int score = 0;
 
@@ -82,6 +85,10 @@ public:
 
 	int getScore() const {
 		return score;
+	}
+
+	bow* getBow() const {
+		return bowPtr;
 	}
 };
 

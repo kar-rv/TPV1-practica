@@ -18,6 +18,8 @@ public:
 	// Coordenadas del vector
 	T getX() const { return x; }
 	T getY() const { return y; }
+	void invertX(){  x=-x; }
+	void invertY(){  y=-y; }
 
 	// Operadores
 	Vector2D operator+(const Vector2D& otro) const {

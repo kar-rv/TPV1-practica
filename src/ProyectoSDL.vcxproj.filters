@@ -48,6 +48,9 @@
     <ClCompile Include="MobileObject.cpp">
       <Filter>Archivos de código fuente</Filter>
     </ClCompile>
+    <ClCompile Include="Butterfly.cpp">
+      <Filter>Archivos de código fuente</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="game.h">
@@ -81,6 +84,9 @@
       <Filter>Archivos de encabezado</Filter>
     </ClInclude>
     <ClInclude Include="MobileObject.h">
+      <Filter>Archivos de encabezado</Filter>
+    </ClInclude>
+    <ClInclude Include="Butterfly.h">
       <Filter>Archivos de encabezado</Filter>
     </ClInclude>
   </ItemGroup>

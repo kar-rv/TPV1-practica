@@ -1,10 +1,12 @@
 #pragma once
 #include <iostream>
 #include "rectangle.h"
-#include "vector2D.h"
-#include "game.h"
 #include "SceneObject.h"
+#include "vector2D.h"
 #include <SDL3/SDL_events.h>
+
+class Texture;
+class Game;
 
 class bow: public SceneObject
 {

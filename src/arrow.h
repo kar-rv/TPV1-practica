@@ -12,7 +12,6 @@ class arrow : public MobileObject
 public:
 	arrow(Rectangle posDim, Texture* textura, Game* game, Vector2D<>vel);
 	~arrow();
-	void render() const;
-	bool update(float delta);
+	bool update(float delta) override;
 };
 

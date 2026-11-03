@@ -34,7 +34,6 @@ bow::handleEvent(const SDL_Event& event) {
 	// si no es una pulsación de tecla, no se hace nada
 	if (event.type != SDL_EVENT_KEY_DOWN)
 		return;
-	cout << "tecla pulsada" << endl;
 
 	if (event.key.key == SDLK_DOWN) {
 		if (posDim.getTopLeftCorner().getY() + posDim.getHeight() < 600)

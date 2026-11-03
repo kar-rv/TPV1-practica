@@ -1,16 +1,23 @@
 #include "infoBar.h"
 #include "texture.h"
 #include "game.h"
+#include "bow.h"
 #include <string>
 
 using namespace std;
 
-infoBar::infoBar(SDL_Renderer* renderer, Texture* arrowTexture)
-	: renderer(renderer), arrowTexture(arrowTexture) {
+infoBar::infoBar(SDL_Renderer* renderer, Texture* arrowTexture, Game* game)
+	: GameObject(game), renderer(renderer), arrowTexture(arrowTexture) {
 }
 
 void
-infoBar::render(int arrowsLeft, int score) const {
+infoBar::render() const {
+	if (game == nullptr || game->getBow() == nullptr) {
+		return;
+	}
+	int arrowsLeft = game->getBow()->getNumFlechas();
+	int score = game->getScore();
+
 	const float margin = 8;
 	const float arrowWidth = 30;
 	const float spacing = 6;  // espacio entre flecha y flecha
