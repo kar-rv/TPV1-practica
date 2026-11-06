@@ -38,7 +38,6 @@ public:
 		ARROW,
 		BALLOON,
 		BUTTERFLY,
-		BACKGROUND,
 		NUM_TEXTURES
 	};
 

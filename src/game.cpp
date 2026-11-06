@@ -35,8 +35,7 @@ constexpr array<TextureSpec, Game::NUM_TEXTURES> textureList{
 	TextureSpec{"bow.png", 1, 2},
 	TextureSpec{"arrow.png"},
 	TextureSpec{"balloons.png", 7, 6},
-	TextureSpec{"butterfly.png"},
-	TextureSpec{"background1.png"}
+	TextureSpec{"butterfly.png"}
 };
 
 Game::Game()
@@ -110,9 +109,8 @@ Game::~Game()
 void
 Game::render() const
 {
+	SDL_SetRenderDrawColor(renderer, 93, 212, 212, 255);
 	SDL_RenderClear(renderer);
-
-	textures[BACKGROUND]->render(); // Llama al método de Texture que dibuja a pantalla completa
 	
 	bowPtr->render();
 	// se renderizan los globos
@@ -220,13 +218,11 @@ Game::generateArrow(const Point2D<>& pos) {
  {
 	 bool colision = false;
 	 // se recorre el array de globos
-	 for (auto object = objects.begin(); object != objects.end(); ) {
-		 // si un globo ha colisionado con una flecha se marca que ha habido colision
+	 for (auto object = objects.begin(); object != objects.end(); ++object) {
 		 if ((*object)->hit(rect)) {
-			colision = true;
-			score += 10;
+			 colision = true;
+			 score += 10;
 		 }
-		 else ++object;
 	 }
 
 	return colision;
