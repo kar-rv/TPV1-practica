@@ -241,13 +241,29 @@ Game::generateArrow(const Point2D<>& pos) {
 
 	 string word;
 	 while (levels >> word) {
-		 if (word == "arrows") {
+		 if (word == "bgcolor") {
+			 //levels >> numArrows;  // ncolor de fondo
+		 }
+		 else if (word == "arrows") {
 			 levels >> numArrows;  // número de flechas
 		 }
 		 else if (word == "baldelay") {
 			 levels >> balloonDelay;  // delay del globo
 			 balloonDelay = balloonDelay / 1000.0f;  // se pasan milisegundos a segundos
 		 }
+		 else if (word == "balpoints") {
+			 //levels >> numArrows;  // número de flechas
+		 }
+		 else if (word == "balspeed") {
+			 //levels >> numArrows;  // número de flechas
+		 }
+		 else if (word == "goal") {
+			 //levels >> numArrows;  // objetivo
+		 }
+		 else if (word == "butterflies") {
+			 levels >> numButterflies;  // número de flechas
+		 }
+		 
 		 else {
 			 // si es cualquier otra palabra se ignora
 			 levels.ignore(numeric_limits<streamsize>::max(), '\n');

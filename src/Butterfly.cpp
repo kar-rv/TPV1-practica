@@ -57,7 +57,6 @@ Butterfly::update(float delta) {
 bool
 Butterfly::hit(const Rectangle& obj) {
     if (!dead && posDim.hasIntersection(obj)) {
-        //row = 1;
         dead = true;
         vel = Vector2D<>(0, 250);
         return true;

@@ -1,6 +1,8 @@
 # Level 1
 bgcolor 0 170 85
-arrows 10
+arrows 15
 baldelay 1000
 balpoints 10
+balspeed 0.2
 goal 100
+butterflies 4
