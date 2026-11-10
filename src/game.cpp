@@ -44,9 +44,9 @@ Game::Game()
 	// carga el archivo de niveles
 	lvlActual = 0;
 	do {
-		cout << "¿Level 1 or 2?" << '\n';
+		cout << "¿Level 1, 2 or 3?" << '\n';
 		cin >> lvlActual;
-	} while (lvlActual != 1 && lvlActual != 2);
+	} while (lvlActual != 1 && lvlActual != 2 && lvlActual!=3);
 	string route = LEVEL_ROOT + to_string(lvlActual) + ".txt";
 
 	if (!loadLevel(route)) {  // este método devuelve true si se ha podido cargar el nivel y false si no
@@ -91,11 +91,22 @@ Game::Game()
 Game::~Game()
 {
 	// se libera la memoria de todos los objetos
-	for (GameObject* object : objects) delete object;
-	for (Texture* texture : textures) delete texture;
+	for (GameObject* object : objects) {
+		delete object;
+	}
+	objects.clear();
+	for (Texture* texture : textures) {
+		delete texture;
+	}
 
-	delete bowPtr;
-	delete infoBarPtr;
+	if (bowPtr != nullptr) {
+		delete bowPtr;
+		bowPtr = nullptr;
+	}
+	if (infoBarPtr != nullptr) {
+		delete infoBarPtr;
+		infoBarPtr = nullptr;
+	}
 
 	SDL_DestroyRenderer(renderer);
 	SDL_DestroyWindow(window);
@@ -105,6 +116,24 @@ Game::~Game()
 void
 Game::render() const
 {
+	if (juegoTerminado) {
+		const float scale = 5.0f;
+		SDL_SetRenderScale(renderer, scale, scale);
+		//color en negro y limpiamos la pantalla
+		SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+		SDL_RenderClear(renderer);
+
+		// Cambiamos el color de dibujo a blanco (para que el texto sea visible)
+		SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+
+		// Pintamos el texto (puedes ajustar las coordenadas X e Y para centrarlo)
+		string text = "HAS GANADO";
+		SDL_RenderDebugText(renderer, 40, 55, text.c_str());
+
+		SDL_RenderPresent(renderer);
+		return;
+	}
+
 	SDL_SetRenderDrawColor(renderer, r, g, b, 255);
 	SDL_RenderClear(renderer);
 	
@@ -125,6 +154,7 @@ Game::render() const
 void
 Game::update(float delta)
 {
+	if (juegoTerminado) return;
 	// temporizador para generar globos
 	static float timeSinceLastBalloonSpawn = 0.0f;
 	timeSinceLastBalloonSpawn += delta;
@@ -289,7 +319,8 @@ Game::checkGoal() {
 	if (score >= goal) {
 		int siguienteNivel = lvlActual + 1;
 		if (siguienteNivel == 4){
-			cout << "HAS GANADO" << endl;
+			end();
+			return;
 		}
 		string route = LEVEL_ROOT + to_string(siguienteNivel) + ".txt";
 
@@ -308,7 +339,7 @@ Game::checkGoal() {
 
 void
 Game::generateNewLevel() {
-	score = 0;
+	score = 140;
 	cout << "level: " << lvlActual << endl;
 	cout << "goal: " << goal << endl;
 	cout << "butterflies: " << numButterflies << endl;
@@ -323,4 +354,27 @@ Game::generateNewLevel() {
 	infoBarPtr = new infoBar(renderer, textures[ARROW], this);
 
 	generarButterflies();
+}
+
+void
+Game::end() {
+	juegoTerminado = true;
+
+	//Borramos todos los objetos de la pantalla de forma segura
+	for (GameObject* object : objects) {
+		delete object;
+	}
+	objects.clear();
+
+	//Borramos bowPtr y lo ponemos a nullptr para evitar dobles borrados
+	if (bowPtr != nullptr) {
+		delete bowPtr;
+		bowPtr = nullptr;
+	}
+
+	//Borramos infoBarPtr y lo ponemos a nullptr
+	if (infoBarPtr != nullptr) {
+		delete infoBarPtr;
+		infoBarPtr = nullptr;
+	}
 }

@@ -54,6 +54,7 @@ private:
 	void generarButterflies();
 	void checkGoal();
 	void generateNewLevel();
+	void end();
 
 	bool exit;
 	Uint64 lastTime;
@@ -75,6 +76,8 @@ private:
 	int score = 0;
 	int lvlActual = 0;
 	int butPoints = -20;
+
+	bool juegoTerminado = false;
 
 public:
 	Game();
