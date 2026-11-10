@@ -116,17 +116,20 @@ Game::~Game()
 void
 Game::render() const
 {
+	//pantalla de cuando se ha acabado el juego
 	if (juegoTerminado) {
+		//escala del texto
 		const float scale = 5.0f;
 		SDL_SetRenderScale(renderer, scale, scale);
+
 		//color en negro y limpiamos la pantalla
 		SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
 		SDL_RenderClear(renderer);
 
-		// Cambiamos el color de dibujo a blanco (para que el texto sea visible)
+		// Cambiamos el color de dibujo a blanco
 		SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
 
-		// Pintamos el texto (puedes ajustar las coordenadas X e Y para centrarlo)
+		// Pintamos el texto
 		string text = "HAS GANADO";
 		SDL_RenderDebugText(renderer, 40, 55, text.c_str());
 
