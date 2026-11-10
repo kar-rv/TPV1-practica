@@ -303,7 +303,7 @@ Game::checkGoal() {
 
 void
 Game::generateNewLevel() {
-	score = 90;
+	score = 0;
 	cout << "level: " << lvlActual << endl;
 	cout << "goal: " << goal << endl;
 	cout << "butterflies: " << numButterflies << endl;
