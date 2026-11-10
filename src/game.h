@@ -65,12 +65,15 @@ private:
 	infoBar* infoBarPtr;
 	std::mt19937_64 random;
 
-	int numArrows = 10;
+	int r = 0, g = 0, b = 0;
+	int numArrows = 0;
 	int goal = 0;
-	int numButterflies = 10;
+	int numButterflies = 0;
 	float balloonDelay = 2.0f;
+	int balPoints = 0;
 	int score = 0;
 	int lvlActual = 0;
+	int butPoints = 20;
 
 public:
 	Game();

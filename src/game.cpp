@@ -84,7 +84,7 @@ Game::Game()
 	// Configura que se pueden utilizar capas translúcidas
 	// SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
 
-	// TODO: crear los objetos del juego
+	// crear los objetos del juego
 	generateNewLevel();
 }
 
@@ -105,7 +105,7 @@ Game::~Game()
 void
 Game::render() const
 {
-	SDL_SetRenderDrawColor(renderer, 93, 212, 212, 255);
+	SDL_SetRenderDrawColor(renderer, r, g, b, 255);
 	SDL_RenderClear(renderer);
 	
 	bowPtr->render();
@@ -137,6 +137,7 @@ Game::update(float delta)
 
 	infoBarPtr->update(delta);
 	bowPtr->update(delta);
+
 	// actualizamos los objetos y los eliminamos si es necesario
 	for (auto object = objects.begin(); object != objects.end(); ) {
 		if ((*object)->update(delta)) {
@@ -146,7 +147,6 @@ Game::update(float delta)
 		}
 		else ++object;
 	}
-	if(lvlActual!=3)
 	checkGoal();
 }
 
@@ -183,8 +183,6 @@ Game::handleEvents()
 		if (event.type == SDL_EVENT_QUIT)
 			exit = true;
 		bowPtr->handleEvent(event);
-
-		// TODO
 	}
 }
 
@@ -221,7 +219,17 @@ Game::generateArrow(const Point2D<>& pos) {
 	 for (auto object = objects.begin(); object != objects.end(); ++object) {
 		 if ((*object)->hit(rect)) {
 			 colision = true;
-			 score += 10;
+			 // Intentamos ver si el objeto es un Balloon
+			 if (balloon* Balloon = dynamic_cast<balloon*>(*object)) {
+				 score += balPoints; // O la puntuación específica del globo
+				 std::cout << "Impacto con globo. Puntos sumados: " << balPoints << std::endl;
+			 }
+			 // Si no es un Balloon, intentamos ver si es una Butterfly
+			 else if (Butterfly* butterfly = dynamic_cast<Butterfly*>(*object)) {
+				 score -= butPoints; // Resta puntos (asegúrate de tener creada esta variable en Game)
+				 if (score < 0) score = 0; // Evita puntuaciones negativas si lo deseas
+				 std::cout << "Impacto con mariposa. Puntos restados: " << butPoints << std::endl;
+			 }
 		 }
 	 }
 
@@ -242,6 +250,7 @@ Game::generateArrow(const Point2D<>& pos) {
 	 string word;
 	 while (levels >> word) {
 		 if (word == "bgcolor") {
+			 levels >> r >> g >> b;
 		 }
 		 else if (word == "arrows") {
 			 levels >> numArrows;  // número de flechas
@@ -251,6 +260,7 @@ Game::generateArrow(const Point2D<>& pos) {
 			 balloonDelay = balloonDelay / 1000.0f;  // se pasan milisegundos a segundos
 		 }
 		 else if (word == "balpoints") {
+			 levels >> balPoints;
 		 }
 		 else if (word == "balspeed") {
 		 }
@@ -286,9 +296,12 @@ void
 Game::checkGoal() {
 	if (score >= goal) {
 		int siguienteNivel = lvlActual + 1;
+		if (siguienteNivel == 4){
+			cout << "HAS GANADO" << endl;
+		}
 		string route = LEVEL_ROOT + to_string(siguienteNivel) + ".txt";
 
-		// Actualizamos el nivel actual antes de cargar para que todo vaya sincronizado
+		// Actualizamos el nivel actual antes de cargar
 		lvlActual = siguienteNivel;
 
 		// Intentamos cargar el archivo del nuevo nivel
