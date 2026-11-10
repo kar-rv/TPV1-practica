@@ -42,12 +42,12 @@ Game::Game()
   : exit(false), random(time(nullptr))
 {
 	// carga el archivo de niveles
-	int lvl = 0;
+	lvlActual = 0;
 	do {
 		cout << "¿Level 1 or 2?" << '\n';
-		cin >> lvl;
-	} while (lvl != 1 && lvl != 2);
-	string route = LEVEL_ROOT + to_string(lvl) + ".txt";
+		cin >> lvlActual;
+	} while (lvlActual != 1 && lvlActual != 2);
+	string route = LEVEL_ROOT + to_string(lvlActual) + ".txt";
 
 	if (!loadLevel(route)) {  // este método devuelve true si se ha podido cargar el nivel y false si no
 		throw "No se ha podido abrir el archivo de niveles";
@@ -85,11 +85,7 @@ Game::Game()
 	// SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
 
 	// TODO: crear los objetos del juego
-	Rectangle rect(Point2D<>(25, 100), 100, 100);
-	bowPtr = new bow(rect, Vector2D<>(0, 10), textures[BOW], numArrows, false, this);
-	infoBarPtr = new infoBar(renderer, textures[ARROW], this);
-
-	generarButterflies();
+	generateNewLevel();
 }
 
 Game::~Game()
@@ -114,8 +110,10 @@ Game::render() const
 	
 	bowPtr->render();
 	// se renderizan los globos
-	for (auto object : objects) {
-		object->render();
+	if (!objects.empty()) {
+		for (auto object : objects) {
+			object->render();
+		}
 	}
 
 	infoBarPtr->render();
@@ -148,6 +146,8 @@ Game::update(float delta)
 		}
 		else ++object;
 	}
+	if(lvlActual!=3)
+	checkGoal();
 }
 
 void
@@ -242,7 +242,6 @@ Game::generateArrow(const Point2D<>& pos) {
 	 string word;
 	 while (levels >> word) {
 		 if (word == "bgcolor") {
-			 //levels >> numArrows;  // ncolor de fondo
 		 }
 		 else if (word == "arrows") {
 			 levels >> numArrows;  // número de flechas
@@ -252,13 +251,11 @@ Game::generateArrow(const Point2D<>& pos) {
 			 balloonDelay = balloonDelay / 1000.0f;  // se pasan milisegundos a segundos
 		 }
 		 else if (word == "balpoints") {
-			 //levels >> numArrows;  // número de flechas
 		 }
 		 else if (word == "balspeed") {
-			 //levels >> numArrows;  // número de flechas
 		 }
 		 else if (word == "goal") {
-			 //levels >> numArrows;  // objetivo
+			 levels >> goal;
 		 }
 		 else if (word == "butterflies") {
 			 levels >> numButterflies;  // número de flechas
@@ -284,3 +281,41 @@ Game::generarButterflies() {
 		 objects.push_back(new Butterfly(rect, Vector2D<>(velX, velY), textures[BUTTERFLY], this));
 	 }
  }
+
+void
+Game::checkGoal() {
+	if (score >= goal) {
+		int siguienteNivel = lvlActual + 1;
+		string route = LEVEL_ROOT + to_string(siguienteNivel) + ".txt";
+
+		// Actualizamos el nivel actual antes de cargar para que todo vaya sincronizado
+		lvlActual = siguienteNivel;
+
+		// Intentamos cargar el archivo del nuevo nivel
+		if (!loadLevel(route)) {
+			throw "No se ha podido abrir el archivo de niveles";
+		}
+		else {
+			generateNewLevel();
+		}
+	}
+}
+
+void
+Game::generateNewLevel() {
+	score = 90;
+	cout << "level: " << lvlActual << endl;
+	cout << "goal: " << goal << endl;
+	cout << "butterflies: " << numButterflies << endl;
+
+	//blorramos los objetos del nivel anterior
+	for (GameObject* object : objects) delete object;
+	objects.clear();
+
+	//creamos nuevos objetos
+	Rectangle rect(Point2D<>(25, 100), 100, 100);
+	bowPtr = new bow(rect, Vector2D<>(0, 10), textures[BOW], numArrows, false, this);
+	infoBarPtr = new infoBar(renderer, textures[ARROW], this);
+
+	generarButterflies();
+}

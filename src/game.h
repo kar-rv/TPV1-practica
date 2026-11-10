@@ -52,6 +52,8 @@ private:
 	void generateBalloon();
 	bool loadLevel(std::string route);
 	void generarButterflies();
+	void checkGoal();
+	void generateNewLevel();
 
 	bool exit;
 	Uint64 lastTime;
@@ -64,9 +66,11 @@ private:
 	std::mt19937_64 random;
 
 	int numArrows = 10;
+	int goal = 0;
 	int numButterflies = 10;
 	float balloonDelay = 2.0f;
 	int score = 0;
+	int lvlActual = 0;
 
 public:
 	Game();
