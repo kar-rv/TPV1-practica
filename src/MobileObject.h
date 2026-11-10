@@ -8,9 +8,16 @@ class MobileObject : public SceneObject
 {
 protected:
 	Vector2D<> vel;
+	float animationTimer = 0.0f;
+	int col = 0;
+	int fil = 0;
 
 public:
-	MobileObject(Rectangle posDim, Texture* textura, Game* game, Vector2D<>vel);
+	MobileObject(Rectangle posDim, Texture* textura, Game* game, Vector2D<>vel, int fil=0);
+	void render() const override;
 	bool update(float dt) override;
+
+	void changeFil();
+
 };
 

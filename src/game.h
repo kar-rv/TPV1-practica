@@ -71,9 +71,10 @@ private:
 	int numButterflies = 0;
 	float balloonDelay = 2.0f;
 	int balPoints = 0;
+	float balSpeed = 0;
 	int score = 0;
 	int lvlActual = 0;
-	int butPoints = 20;
+	int butPoints = -20;
 
 public:
 	Game();
@@ -91,6 +92,16 @@ public:
 
 	int getScore() const {
 		return score;
+	}
+	void changeScore(int points) {
+		score += points;
+	}
+
+	int getBalPoints() const { 
+		return balPoints;
+	}
+	int getButPoints() const { 
+		return butPoints;
 	}
 
 	bow* getBow() const {

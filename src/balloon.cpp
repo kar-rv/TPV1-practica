@@ -1,25 +1,16 @@
 #include "balloon.h"
 #include "texture.h"
+#include "game.h"
 
 using namespace std;
 
-balloon::balloon(Rectangle posDim, Vector2D<> vel, Texture* textura, int color, Game* game) : 
-	MobileObject(posDim,  textura, game, vel), color(color) {
+balloon::balloon(Rectangle posDim, Vector2D<> vel, Texture* textura, int fil, Game* game) : 
+	MobileObject(posDim,  textura, game, vel, fil) {
 
 }
 
 balloon::~balloon() {
 
-}
-
-void
-balloon::render() const {
-	if (textura != nullptr) {
-		// convertimos el Rectangle a SDL_FRect usando to_sdl()
-		SDL_FRect destRect = posDim.to_sdl();
-
-		textura->renderFrame(destRect, color, row);
-	}
 }
 
 bool
@@ -34,10 +25,10 @@ balloon::update(float delta) {
 		SDL_FRect destRect = posDim.to_sdl();
 		animationTimer += delta;
 		if (animationTimer > 0.05f) {
-			row++;
+			col++;
 			animationTimer = 0.0f;
 		}
-		if (row > 6) {
+		if (col > 6) {
 			return true;
 		}
 	}
@@ -50,8 +41,10 @@ balloon::update(float delta) {
 bool
 balloon::hit(const Rectangle& obj) {
 	if (!dead && posDim.hasIntersection(obj)) {
-		row = 1;
+		col = 1;
 		dead = true;
+		//actualizamos el score del game
+		game->changeScore(game->getBalPoints());
 		return true;
 	}
 	return false;

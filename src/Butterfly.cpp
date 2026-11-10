@@ -20,13 +20,32 @@ Butterfly::update(float delta) {
     float height = posDim.getHeight();
 
     if (dead) {
+        //la maroposa cae hacia abajo
         posDim.move(Vector2D<>(vel.getX() * delta, vel.getY() * delta));
+
+        //se elimina si lleva al limite de la pantalla
         if (y > Game::WINDOW_HEIGHT) {
             std::cout << "muerto" << std::endl;
             return true;
         }
     }
     else {
+        //animación
+        if (vel.getX() >= 0) {
+            fil = 1;
+        }
+        else
+            fil = 0;
+        animationTimer += delta;
+        if (animationTimer > 0.05f) {
+            col++;
+            animationTimer = 0.0f;
+        }
+        if (col > 6) {
+            col = 0;
+        }
+
+        //vemos si tiene que cambiar de dirección
         if (std::uniform_int_distribution<int>(0, probCambiar + 1)(random) == probCambiar) {
             vel.invertX();
             vel.invertY();
@@ -59,6 +78,15 @@ Butterfly::hit(const Rectangle& obj) {
     if (!dead && posDim.hasIntersection(obj)) {
         dead = true;
         vel = Vector2D<>(0, 250);
+
+        //actualizamos el score del game
+        int newScore = game->getScore() + game->getButPoints();
+        //el score no puede ser negativo, tope en 0
+        if (newScore <= 0) 
+            game->changeScore(-game->getScore());
+        else
+        game->changeScore(game->getButPoints());
+
         return true;
     }
     return false;

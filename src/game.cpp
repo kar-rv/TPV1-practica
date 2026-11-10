@@ -35,7 +35,7 @@ constexpr array<TextureSpec, Game::NUM_TEXTURES> textureList{
 	TextureSpec{"bow.png", 1, 2},
 	TextureSpec{"arrow.png"},
 	TextureSpec{"balloons.png", 7, 6},
-	TextureSpec{"butterfly.png"}
+	TextureSpec{"butterfly.png", 4, 10}
 };
 
 Game::Game()
@@ -129,7 +129,7 @@ Game::update(float delta)
 	static float timeSinceLastBalloonSpawn = 0.0f;
 	timeSinceLastBalloonSpawn += delta;
 
-	// generar un globo cada 2
+	// generamos los globos
 	if (timeSinceLastBalloonSpawn > balloonDelay) {
 		generateBalloon();
 		timeSinceLastBalloonSpawn = 0.0f;
@@ -147,6 +147,7 @@ Game::update(float delta)
 		}
 		else ++object;
 	}
+	// vemos si hemos logrado el goal del nivel para pasar al siguiente
 	checkGoal();
 }
 
@@ -191,11 +192,12 @@ Game::generateBalloon() {
 	// valores random
 	int color = uniform_int_distribution<int>(0, 6)(random);
 	int posX = uniform_int_distribution<int>(200, 700)(random);
-	float velY = uniform_int_distribution<int>(50, 200)(random);
+	float velY = uniform_int_distribution<int>(200, 500)(random) * balSpeed;
 	Rectangle rect(Point2D<>(posX, 600), 100, 100);
 
 	// se genera el globo con los valores random
-	objects.push_back(new balloon(rect, Vector2D<>(0, -velY), textures[BALLOON], color, this));
+	balloon* Balloon= new balloon(rect, Vector2D<>(0, -velY), textures[BALLOON], color, this);
+	objects.push_back(Balloon);
 }
 
 void
@@ -215,21 +217,10 @@ Game::generateArrow(const Point2D<>& pos) {
  Game::checkCollision(const Rectangle& rect)
  {
 	 bool colision = false;
-	 // se recorre el array de globos
+	 // se recorre el array de objetos
 	 for (auto object = objects.begin(); object != objects.end(); ++object) {
-		 if ((*object)->hit(rect)) {
+		 if ((*object)->hit(rect)) { //el hit de cada objeto se encarga de actualizar el score
 			 colision = true;
-			 // Intentamos ver si el objeto es un Balloon
-			 if (balloon* Balloon = dynamic_cast<balloon*>(*object)) {
-				 score += balPoints; // O la puntuación específica del globo
-				 std::cout << "Impacto con globo. Puntos sumados: " << balPoints << std::endl;
-			 }
-			 // Si no es un Balloon, intentamos ver si es una Butterfly
-			 else if (Butterfly* butterfly = dynamic_cast<Butterfly*>(*object)) {
-				 score -= butPoints; // Resta puntos (asegúrate de tener creada esta variable en Game)
-				 if (score < 0) score = 0; // Evita puntuaciones negativas si lo deseas
-				 std::cout << "Impacto con mariposa. Puntos restados: " << butPoints << std::endl;
-			 }
 		 }
 	 }
 
@@ -250,7 +241,7 @@ Game::generateArrow(const Point2D<>& pos) {
 	 string word;
 	 while (levels >> word) {
 		 if (word == "bgcolor") {
-			 levels >> r >> g >> b;
+			 levels >> r >> g >> b; //colores del background
 		 }
 		 else if (word == "arrows") {
 			 levels >> numArrows;  // número de flechas
@@ -260,12 +251,13 @@ Game::generateArrow(const Point2D<>& pos) {
 			 balloonDelay = balloonDelay / 1000.0f;  // se pasan milisegundos a segundos
 		 }
 		 else if (word == "balpoints") {
-			 levels >> balPoints;
+			 levels >> balPoints; //puntuacion por globo
 		 }
 		 else if (word == "balspeed") {
+			 levels >> balSpeed; //velocidad de los globos
 		 }
 		 else if (word == "goal") {
-			 levels >> goal;
+			 levels >> goal; //puntuación de victoria
 		 }
 		 else if (word == "butterflies") {
 			 levels >> numButterflies;  // número de flechas
@@ -284,8 +276,8 @@ Game::generarButterflies() {
 	 for (int i = 0; i < numButterflies; i++) {
 		 int posX = uniform_int_distribution<int>(0, WINDOW_WIDTH - 75)(random);
 		 int posY = uniform_int_distribution<int>(0, WINDOW_HEIGHT - 75)(random);
-		 float velX = uniform_int_distribution<int>(-200, 200)(random);
-		 float velY = uniform_int_distribution<int>(-200, 200)(random);
+		 float velX = uniform_int_distribution<int>(-100, 100)(random);
+		 float velY = uniform_int_distribution<int>(-100, 100)(random);
 
 		 Rectangle rect(Point2D<>(posX, posY), 75, 75);
 		 objects.push_back(new Butterfly(rect, Vector2D<>(velX, velY), textures[BUTTERFLY], this));
