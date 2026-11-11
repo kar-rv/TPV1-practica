@@ -22,3 +22,14 @@ MobileObject::render() const {
 	}
 }
 
+void
+MobileObject::loadValues(std::istream& load) {
+	SceneObject::loadValues(load);
+	float u, v;
+	if (!(load >> u >> v)) {
+		throw std::string("Error: velocidad incorrecta");
+	}
+
+	vel = Vector2D<>(u, v);
+}
+

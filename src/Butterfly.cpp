@@ -101,3 +101,14 @@ Butterfly::saveValues(std::ostream& save) {
         << posDim.getWidth() << " " << posDim.getHeight() << " " << vel.getX() << " " << vel.getY() << " "
         << n << " " << std:: endl;
 }
+
+void
+Butterfly::loadValues(std::istream& load) {
+    MobileObject::loadValues(load);
+    char n;
+    if (!(load >> n) || (n != 'm' && n != 'n')) {
+        throw std::string("Error: datos de mariposa incorrectos");
+    }
+        
+    dead = (n == 'm');
+}

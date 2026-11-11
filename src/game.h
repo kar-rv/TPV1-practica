@@ -55,7 +55,7 @@ private:
 	void checkGoal();
 	void generateNewLevel();
 	void saveLevel(std::string route);
-	void loadSavedLevel();
+	void loadSavedLevel(std::string route);
 	void end();
 
 	bool exit;
@@ -64,8 +64,8 @@ private:
 	// Elemento del juego
 	// TODO: añadir atributos para los objetos del juego
 	std::list<SceneObject*> objects;
-	bow* bowPtr;
-	infoBar* infoBarPtr;
+	bow* bowPtr = nullptr;
+	infoBar* infoBarPtr = nullptr;
 	std::mt19937_64 random;
 
 	int r = 0, g = 0, b = 0;

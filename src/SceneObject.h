@@ -17,6 +17,6 @@ public:
 	virtual bool hit(const Rectangle&);
 	virtual void render() const override;
 	virtual void saveValues(std::ostream& save);
-	// virtual void loadValues(std::istream& load);
+	virtual void loadValues(std::istream& load);
 };
 

@@ -58,3 +58,15 @@ balloon::saveValues(std::ostream& save) {
 		<< posDim.getWidth() << " " << posDim.getHeight() << " " << vel.getX() << " " << vel.getY() << " "
 		<< n << " " << fil << endl;
 }
+
+void
+balloon::loadValues(std::istream& load) {
+	MobileObject::loadValues(load);
+	char n;
+	if (!(load >> n >> fil) || (n != 'e' && n != 'n')) {
+		throw string("Error: datos de globo incorrectos");
+	}
+
+	dead = (n == 'e');
+	if (dead) col = 1;  // para que se inicie la animación de morir
+}

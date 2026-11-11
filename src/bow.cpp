@@ -73,3 +73,18 @@ bow::saveValues(std::ostream& save) {
 		<< posDim.getWidth() << " " << posDim.getHeight() << " " << vel.getX() << " " << vel.getY() << " "
 		<< n << " " << numFlechas << endl;
 }
+
+void
+bow::loadValues(std::istream& load) {
+	SceneObject::loadValues(load);
+	float u, v;
+	char n;
+	int flechas;
+	if (!(load >> u >> v >> n >> flechas) || (n != 'a' && n != 'n') || flechas < 0) {
+		throw std::string("Error: datos del arco incorrectos");
+	}
+	
+	vel = Vector2D<>(u, v);
+	armado = (n == 'a');
+	numFlechas = flechas;
+}

@@ -23,3 +23,14 @@ void
 SceneObject::saveValues(std::ostream& save) {
 	return;
 }
+
+void
+SceneObject::loadValues(std::istream& load) {
+	float x, y, w, h;
+	if (!(load >> x >> y >> w >> h)) {
+		throw std::string("Error: posicion y/o dimensiones incorrectas");
+	}
+		
+	posDim = Rectangle(Point2D<>(x, y), w, h);
+}
+

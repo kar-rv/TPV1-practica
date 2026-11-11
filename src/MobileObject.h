@@ -17,6 +17,7 @@ public:
 	virtual ~MobileObject() = default;
 	void render() const override;
 	bool update(float dt) override;
+	void loadValues(std::istream& load) override;
 
 	void changeFil();
 

@@ -47,7 +47,7 @@ Game::Game()
 	do {
 		cout << "¿Level 1, 2 or 3?" << '\n';
 		cin >> lvlActual;
-	} while (lvlActual != 1 && lvlActual != 2 && lvlActual!=3);
+	} while (lvlActual != 1 && lvlActual != 2 && lvlActual != 3);
 	string route = LEVEL_ROOT + to_string(lvlActual) + ".txt";
 
 	if (!loadLevel(route)) {  // este método devuelve true si se ha podido cargar el nivel y false si no
@@ -170,6 +170,7 @@ Game::update(float delta)
 	}
 
 	infoBarPtr->update(delta);
+	bowPtr->update(delta);
 
 	// actualizamos los objetos y los eliminamos si es necesario
 	for (auto object = objects.begin(); object != objects.end(); ) {
@@ -226,6 +227,15 @@ Game::handleEvents()
 				// se guardan los datos del juego actual
 				saveLevel(SAVES_ROOT);
 			}
+
+			if (control && event.key.key == SDLK_O && !event.key.repeat) {
+				try {
+					loadSavedLevel(SAVES_ROOT);
+				}
+				catch (const string& e) {
+					cerr << e << endl;   // se sigue jugando la actual si la partida no ha cargado bien
+				}
+			}
 		}
 	}
 }
@@ -275,9 +285,7 @@ Game::generateArrow(const Point2D<>& pos) {
  {
 	 ifstream levels(route);
 	 if (!levels.is_open()) {
-		 // cerr es como cout pero se utiliza cuando se escribe un mensaje de error (aunque funcionan igual)
 		 throw "Error: No se pudo abrir el archivo con ruta (" + route + ")"s;
-		 //cerr << "No se pudo abrir el archivo con ruta " << route << '\n';
 		 return false;
 	 }
 
@@ -363,6 +371,9 @@ Game::generateNewLevel() {
 
 	//creamos nuevos objetos
 	Rectangle rect(Point2D<>(25, 100), 100, 100);
+	// se borran el arco y la infobar antes de crear las nuevas
+	delete bowPtr;
+	delete infoBarPtr;
 	bowPtr = new bow(rect, Vector2D<>(0, 10), textures[BOW], numArrows, false, this);
 	infoBarPtr = new infoBar(renderer, textures[ARROW], this);
 
@@ -378,14 +389,82 @@ Game::saveLevel(string route) {
 	}
 
 	save << lvlActual << " " << score << endl;
+	bowPtr->saveValues(save);
 	for (auto object = objects.begin(); object != objects.end(); ++object) {
 		(*object)->saveValues(save);
 	}
+	cout << "Se ha guardado el archivo" << endl;
 }
 
 void
-Game::loadSavedLevel() {
+Game::loadSavedLevel(string route) {
+	ifstream load(route);
+	if (!load) {
+		throw "Error: no se pudo abrir el archivo con ruta (" + route + ")"s;
+	}
 
+	int lvl, pts;
+	if (!(load >> lvl >> pts) || lvl < 1 || lvl > 3) {
+		throw "Error: nivel y/o puntuacion incorrectas"s;
+	}
+
+	Rectangle rect(Point2D<>(0, 0), 0, 0);   // valores de relleno que luego se cargan con loadValue()
+	Vector2D<> vel(0, 0);
+	list<SceneObject*> objs;
+	bow* newBow = nullptr;
+
+	try {
+		string word;
+		while (load >> word) {
+			if (word == "bow") {
+				newBow = new bow(rect, vel, textures[BOW], 0, false, this);
+				newBow->loadValues(load);
+			}
+			else {
+				SceneObject* obj = nullptr;
+				if (word == "balloon") {
+					obj = new balloon(rect, vel, textures[BALLOON], 0, this);
+				}
+				else if (word == "arrow") {
+					obj = new arrow(rect, textures[ARROW], this, vel);
+				}
+				else if (word == "butterfly") {
+					obj = new Butterfly(rect, vel, textures[BUTTERFLY], this);
+				}
+				else {
+					throw "Error: este objeto no existe (" + word + ")"s;
+				}
+
+				objs.push_back(obj);  // se guarda el objeto en la lista de objetos
+				obj->loadValues(load);  // se cargan los valores
+			}
+		}
+
+		if (newBow == nullptr) {
+			throw "Error: el arco no se ha guardado"s;
+		}
+
+		// se carga el nivel (1, 2, 3...)
+		string levelRoute = LEVEL_ROOT + to_string(lvl) + ".txt";
+		if (!loadLevel(levelRoute)) {
+			throw "No se ha podido abrir el archivo de niveles"s;
+		}
+	}
+	// si falla la carga aqui se borra todo lo que se quedo a mitad para evitar memory leaks
+	catch (...) {
+		for (SceneObject* o : objs) delete o;
+		delete newBow;
+		throw;
+	}
+
+	// se sustituye la partida
+	for (SceneObject* o : objects) delete o;
+	objects = objs;
+	delete bowPtr;
+	bowPtr = newBow;
+	lvlActual = lvl;
+	score = pts;
+	cout << "se ha cargado la partida" << endl;
 }
 
 void
