@@ -14,6 +14,7 @@ protected:
 
 public:
 	MobileObject(Rectangle posDim, Texture* textura, Game* game, Vector2D<>vel, int fil=0);
+	virtual ~MobileObject() = default;
 	void render() const override;
 	bool update(float dt) override;
 

@@ -13,7 +13,10 @@ protected:
 
 public:
 	SceneObject(Rectangle posDim, Texture* textura, Game* game);
+	virtual ~SceneObject() = default;
 	virtual bool hit(const Rectangle&);
 	virtual void render() const override;
+	virtual void saveValues(std::ostream& save);
+	// virtual void loadValues(std::istream& load);
 };
 

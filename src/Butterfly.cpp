@@ -91,3 +91,13 @@ Butterfly::hit(const Rectangle& obj) {
     }
     return false;
 }
+
+void
+Butterfly::saveValues(std::ostream& save) {
+    char n = 'n';
+    if (dead) n = 'm';
+    // por orden se guarda: posicion(x, y), dimensiones(w, h), velocidad(u, v), muerta(m -> si / n -> no)
+    save << "butterfly " << posDim.getTopLeftCorner().getX() << " " << posDim.getTopLeftCorner().getY() << " "
+        << posDim.getWidth() << " " << posDim.getHeight() << " " << vel.getX() << " " << vel.getY() << " "
+        << n << " " << std:: endl;
+}

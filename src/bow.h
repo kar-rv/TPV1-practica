@@ -21,6 +21,7 @@ public:
 	void render() const override;
 	bool update(float dt) override;
 	void handleEvent(const SDL_Event& event);
+	void saveValues(std::ostream& save) override;
 
 	int getNumFlechas() const {
 		return numFlechas;

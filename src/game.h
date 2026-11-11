@@ -54,6 +54,8 @@ private:
 	void generarButterflies();
 	void checkGoal();
 	void generateNewLevel();
+	void saveLevel(std::string route);
+	void loadSavedLevel();
 	void end();
 
 	bool exit;

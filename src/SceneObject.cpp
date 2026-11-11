@@ -18,3 +18,8 @@ SceneObject::render() const {
 		textura->renderFrame(destRect, 0, 0);
 	}
 }
+
+void
+SceneObject::saveValues(std::ostream& save) {
+	return;
+}

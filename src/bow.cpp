@@ -32,36 +32,44 @@ bow::update(float delta) {
 void
 bow::handleEvent(const SDL_Event& event) {
 	// si no es una pulsación de tecla, no se hace nada
-	if (event.type != SDL_EVENT_KEY_DOWN)
-		return;
-
-	if (event.key.key == SDLK_DOWN) {
-		if (posDim.getTopLeftCorner().getY() + posDim.getHeight() < 600)
-			posDim.move(vel);
-	}
-
-	else if (event.key.key == SDLK_UP) {
-		if(posDim.getTopLeftCorner().getY() >= 1)
-			posDim.move(Vector2D<>(-vel.getX(), -vel.getY()));
-	}
-
-	else if (event.key.key == SDLK_LEFT) {
-		if (numFlechas > 0) {
-			armado = true;  // cargar flecha
+	if (event.type == SDL_EVENT_KEY_DOWN) {
+		if (event.key.key == SDLK_DOWN) {
+			if (posDim.getTopLeftCorner().getY() + posDim.getHeight() < 600)
+				posDim.move(vel);
 		}
-		cout << "armado" << endl;
-	}
 
-	else if (event.key.key == SDLK_RIGHT) {
-		cout << "armado = " << armado << " flechas = " << numFlechas << endl;
-		if (armado && numFlechas > 0) {
-			// Punto de salida: borde derecho del arco, a media altura
-			Point2D<> origin(posDim.getTopLeftCorner().getX() + posDim.getWidth() / 2,
-				posDim.getTopLeftCorner().getY() + posDim.getHeight() / 2);
-			game->generateArrow(origin);
-			armado = false;
-			--numFlechas;
+		else if (event.key.key == SDLK_UP) {
+			if (posDim.getTopLeftCorner().getY() >= 1)
+				posDim.move(Vector2D<>(-vel.getX(), -vel.getY()));
+		}
+
+		else if (event.key.key == SDLK_LEFT) {
+			if (numFlechas > 0) {
+				armado = true;  // cargar flecha
+			}
+			cout << "armado" << endl;
+		}
+
+		else if (event.key.key == SDLK_RIGHT) {
+			cout << "armado = " << armado << " flechas = " << numFlechas << endl;
+			if (armado && numFlechas > 0) {
+				// Punto de salida: borde derecho del arco, a media altura
+				Point2D<> origin(posDim.getTopLeftCorner().getX() + posDim.getWidth() / 2,
+					posDim.getTopLeftCorner().getY() + posDim.getHeight() / 2);
+				game->generateArrow(origin);
+				armado = false;
+				--numFlechas;
+			}
 		}
 	}
-	
+}
+
+void
+bow::saveValues(std::ostream& save) {
+	char n = 'n';
+	if (armado) n = 'a';
+	// por orden se guarda: posicion(x, y), dimensiones(w, h), velocidad(u, v), armado(a -> si / n -> no), numflechas
+	save << "bow " << posDim.getTopLeftCorner().getX() << " " << posDim.getTopLeftCorner().getY() << " "
+		<< posDim.getWidth() << " " << posDim.getHeight() << " " << vel.getX() << " " << vel.getY() << " "
+		<< n << " " << numFlechas << endl;
 }

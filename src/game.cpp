@@ -3,6 +3,7 @@
 #include <fstream>
 #include <string>
 #include <limits>
+#include <vector>
 
 #include <SDL3_image/SDL_image.h>
 
@@ -17,12 +18,12 @@
 using namespace std;
 
 // Constantes
-constexpr const char* const WINDOW_TITLE = "Bow & Arrow 1.0";
+constexpr const char* const WINDOW_TITLE = "Bow & Arrow 2.0";
 constexpr const char* IMAGE_ROOT = "../assets/images/";
 constexpr const char* LEVEL_ROOT = "../assets/levels/";
+constexpr const char* SAVES_ROOT = "../assets/saves/saved.txt";
 
-// Estructura para especificar las texturas que hay que
-// cargar y el tamaño de su matriz de frames
+// Estructura para especificar las texturas que hay que cargar y el tamaño de su matriz de frames
 struct TextureSpec
 {
 	const char* name;
@@ -73,7 +74,7 @@ Game::Game()
 		}
 	}
 	catch (...) {
-		// TODO: liberar la memoria reservada
+		// liberar la memoria reservada
 		for (size_t j = 0; j < i; j++) {
 			delete textures[j];
 			textures[j] = nullptr;
@@ -126,32 +127,32 @@ Game::render() const
 		SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
 		SDL_RenderClear(renderer);
 
-		// Cambiamos el color de dibujo a blanco
+		//cambiamos el color de dibujo a blanco
 		SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
 
-		// Pintamos el texto
+		//pintamos el texto
 		string text = "HAS GANADO";
 		SDL_RenderDebugText(renderer, 40, 55, text.c_str());
 
 		SDL_RenderPresent(renderer);
-		return;
 	}
+	else {
+		SDL_SetRenderDrawColor(renderer, r, g, b, 255);
+		SDL_RenderClear(renderer);
 
-	SDL_SetRenderDrawColor(renderer, r, g, b, 255);
-	SDL_RenderClear(renderer);
-	
-	bowPtr->render();
-	// se renderizan los globos
-	if (!objects.empty()) {
-		for (auto object : objects) {
-			object->render();
+		bowPtr->render();
+		// se renderizan los globos
+		if (!objects.empty()) {
+			for (auto object : objects) {
+				object->render();
+			}
 		}
+
+		infoBarPtr->render();
+
+		// se llama al renderer
+		SDL_RenderPresent(renderer);
 	}
-
-	infoBarPtr->render();
-
-	// se llama al renderer
-	SDL_RenderPresent(renderer);
 }
 
 void
@@ -169,7 +170,6 @@ Game::update(float delta)
 	}
 
 	infoBarPtr->update(delta);
-	bowPtr->update(delta);
 
 	// actualizamos los objetos y los eliminamos si es necesario
 	for (auto object = objects.begin(); object != objects.end(); ) {
@@ -217,6 +217,16 @@ Game::handleEvents()
 		if (event.type == SDL_EVENT_QUIT)
 			exit = true;
 		bowPtr->handleEvent(event);
+
+		// si no es una pulsación de tecla, no se hace nada
+		if (event.type == SDL_EVENT_KEY_DOWN) {
+			bool control = (event.key.mod & SDL_KMOD_CTRL) != 0;
+			if (control && event.key.key == SDLK_S && !event.key.repeat) {
+				// !event.key.repeat evita que se ejecute todo el rato al mantenerlo pulsado
+				// se guardan los datos del juego actual
+				saveLevel(SAVES_ROOT);
+			}
+		}
 	}
 }
 
@@ -293,7 +303,7 @@ Game::generateArrow(const Point2D<>& pos) {
 			 levels >> goal; //puntuación de victoria
 		 }
 		 else if (word == "butterflies") {
-			 levels >> numButterflies;  // número de flechas
+			 levels >> numButterflies;  // número de mariposas
 		 }
 		 
 		 else {
@@ -357,6 +367,25 @@ Game::generateNewLevel() {
 	infoBarPtr = new infoBar(renderer, textures[ARROW], this);
 
 	generarButterflies();
+}
+
+void
+Game::saveLevel(string route) {
+	ofstream save(route);
+	if (!save) {
+		throw "Error: No se pudo abrir el archivo con ruta (" + route + ")"s;
+		return;
+	}
+
+	save << lvlActual << " " << score << endl;
+	for (auto object = objects.begin(); object != objects.end(); ++object) {
+		(*object)->saveValues(save);
+	}
+}
+
+void
+Game::loadSavedLevel() {
+
 }
 
 void

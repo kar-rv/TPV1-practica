@@ -13,5 +13,6 @@ public:
 	arrow(Rectangle posDim, Texture* textura, Game* game, Vector2D<>vel);
 	~arrow();
 	bool update(float delta) override;
+	void saveValues(std::ostream& save) override;
 };
 

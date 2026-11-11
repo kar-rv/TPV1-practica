@@ -21,3 +21,10 @@ arrow::update(float delta) {
 	game->checkCollision(rect);
 	return posDim.getTopLeftCorner().getX() > Game::WINDOW_WIDTH;
 }
+
+void
+arrow::saveValues(std::ostream& save) {
+	// por orden se guarda: posicion(x, y), dimensiones(w, h), velocidad(u, v)
+	save << "arrow " << posDim.getTopLeftCorner().getX() << " " << posDim.getTopLeftCorner().getY() << " "
+		<< posDim.getWidth() << " " << posDim.getHeight() << " " << vel.getX() << " " << vel.getY() << " " << endl;
+}

@@ -11,6 +11,7 @@ public:
 
 	bool update(float delta) override;
 	bool hit(const Rectangle& obj) override;
+	void saveValues(std::ostream& save) override;
 
 private:
 	bool dead = false;

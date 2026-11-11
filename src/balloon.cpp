@@ -19,8 +19,6 @@ balloon::update(float delta) {
 	if (posDim.getTopLeftCorner().getY() + posDim.getHeight() < 0)
 		return true;
 
-	//movemos el glovo hacia ariba
-
 	if (dead) {
 		SDL_FRect destRect = posDim.to_sdl();
 		animationTimer += delta;
@@ -33,6 +31,7 @@ balloon::update(float delta) {
 		}
 	}
 	else
+		//movemos el glovo hacia ariba
 		posDim.move(Vector2D<>(0, vel.getY() * delta));
 
 	return false;
@@ -48,4 +47,14 @@ balloon::hit(const Rectangle& obj) {
 		return true;
 	}
 	return false;
+}
+
+void
+balloon::saveValues(std::ostream& save) {
+	char n = 'n';
+	if (dead) n = 'e';
+	// por orden se guarda: posicion(x, y), dimensiones(w, h), velocidad(u, v), explotado(e -> si / n -> no), color
+	save << "balloon " << posDim.getTopLeftCorner().getX() << " " << posDim.getTopLeftCorner().getY() << " "
+		<< posDim.getWidth() << " " << posDim.getHeight() << " " << vel.getX() << " " << vel.getY() << " "
+		<< n << " " << fil << endl;
 }
