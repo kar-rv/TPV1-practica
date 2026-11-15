@@ -7,14 +7,21 @@
 
 #include "game.h"
 #include <string>
+#include "GameError.h"
 
-int main(int argc, char* argv[])
-{
+using namespace std;
+
+int main(int argc, char* argv[]) {
 	try {
 		Game().run();
 	}
-	catch (const std::string& e) {
-		std::cerr << "Excepcion capturada: " << e << std::endl;
+	catch (const GameError& e) {
+		cerr << e.what() << endl;
+		SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error", e.what(), nullptr);
+		return 1;
+	}
+	catch (const exception& e) {
+		cerr << e.what() << endl;
 		return 1;
 	}
 	return 0;

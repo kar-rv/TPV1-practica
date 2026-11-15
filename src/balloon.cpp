@@ -1,6 +1,7 @@
 #include "balloon.h"
 #include "texture.h"
 #include "game.h"
+#include "GameError.h"
 
 using namespace std;
 
@@ -64,7 +65,7 @@ balloon::loadValues(std::istream& load) {
 	MobileObject::loadValues(load);
 	char n;
 	if (!(load >> n >> fil) || (n != 'e' && n != 'n')) {
-		throw string("Error: datos de globo incorrectos");
+		throw GameError("Error: datos de globo incorrectos");
 	}
 
 	dead = (n == 'e');

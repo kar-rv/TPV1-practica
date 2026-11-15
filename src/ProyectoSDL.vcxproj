@@ -116,6 +116,7 @@
     <ClInclude Include="bow.h" />
     <ClInclude Include="Butterfly.h" />
     <ClInclude Include="game.h" />
+    <ClInclude Include="GameError.h" />
     <ClInclude Include="GameObject.h" />
     <ClInclude Include="infoBar.h" />
     <ClInclude Include="MobileObject.h" />

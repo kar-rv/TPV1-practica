@@ -1,6 +1,7 @@
 #include "MobileObject.h"
 #include "game.h"
 #include "texture.h"
+#include "GameError.h"
 
 MobileObject::MobileObject(Rectangle posDim, Texture* textura, Game* game, Vector2D<>vel, int fil) :
 	SceneObject(posDim, textura, game), vel(vel), fil(fil) {
@@ -27,7 +28,7 @@ MobileObject::loadValues(std::istream& load) {
 	SceneObject::loadValues(load);
 	float u, v;
 	if (!(load >> u >> v)) {
-		throw std::string("Error: velocidad incorrecta");
+		throw GameError("Error: velocidad incorrecta");
 	}
 
 	vel = Vector2D<>(u, v);

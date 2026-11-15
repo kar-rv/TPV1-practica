@@ -1,6 +1,7 @@
 #include "SceneObject.h"
 #include "game.h"
 #include "texture.h"
+#include "GameError.h"
 
 SceneObject::SceneObject(Rectangle posDim, Texture* textura, Game* game) :
 	GameObject(game), posDim(posDim), textura(textura) {
@@ -28,7 +29,7 @@ void
 SceneObject::loadValues(std::istream& load) {
 	float x, y, w, h;
 	if (!(load >> x >> y >> w >> h)) {
-		throw std::string("Error: posicion y/o dimensiones incorrectas");
+		throw GameError("Error: posicion y/o dimensiones incorrectas");
 	}
 		
 	posDim = Rectangle(Point2D<>(x, y), w, h);

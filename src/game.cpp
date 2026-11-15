@@ -4,6 +4,7 @@
 #include <string>
 #include <limits>
 #include <vector>
+#include <sstream>
 
 #include <SDL3_image/SDL_image.h>
 
@@ -14,6 +15,7 @@
 #include "arrow.h"
 #include "infoBar.h"
 #include "Butterfly.h"
+#include "GameError.h"
 
 using namespace std;
 
@@ -50,18 +52,15 @@ Game::Game()
 	} while (lvlActual != 1 && lvlActual != 2 && lvlActual != 3);
 	string route = LEVEL_ROOT + to_string(lvlActual) + ".txt";
 
-	if (!loadLevel(route)) {  // este método devuelve true si se ha podido cargar el nivel y false si no
-		throw "No se ha podido abrir el archivo de niveles";
-	}
+	loadLevel(route);  // lanza FileNotFoundError o FileFormatError si falla
 
 	// Carga SDL y crea la ventana con su renderizador
-	if (!SDL_Init(SDL_INIT_VIDEO))
-		throw "SDL_Init: "s + SDL_GetError();
+	if (!SDL_Init(SDL_INIT_VIDEO)) throw SDLError("SDL_Init");
 
 	if (!SDL_CreateWindowAndRenderer(WINDOW_TITLE,
 	                                 WINDOW_WIDTH, WINDOW_HEIGHT,
 	                                 0, &window, &renderer))
-		throw "window or renderer: "s + SDL_GetError();
+		throw SDLError("SDL_CreateWindowAndRenderer");
 	size_t i = 0;
 	// Carga las texturas al inicio
 	try {
@@ -79,7 +78,7 @@ Game::Game()
 			delete textures[j];
 			textures[j] = nullptr;
 		}
-		throw "Error al cargar las texturas"s; // relanza la excepción
+		throw;
 	}
 
 	// Configura que se pueden utilizar capas translúcidas
@@ -225,15 +224,20 @@ Game::handleEvents()
 			if (control && event.key.key == SDLK_S && !event.key.repeat) {
 				// !event.key.repeat evita que se ejecute todo el rato al mantenerlo pulsado
 				// se guardan los datos del juego actual
-				saveLevel(SAVES_ROOT);
+				try {
+					saveLevel(SAVES_ROOT);
+				}
+				catch (const GameError& e) {
+					cerr << e.what() << endl;  // no se guardo
+				}
 			}
 
 			if (control && event.key.key == SDLK_O && !event.key.repeat) {
 				try {
 					loadSavedLevel(SAVES_ROOT);
 				}
-				catch (const string& e) {
-					cerr << e << endl;   // se sigue jugando la actual si la partida no ha cargado bien
+				catch (const GameError& e) {
+					cerr << e.what() << endl;   // se sigue jugando la actual si la partida no ha cargado bien
 				}
 			}
 		}
@@ -280,13 +284,68 @@ Game::generateArrow(const Point2D<>& pos) {
 	return colision;
  }
 
- bool
+ void
+ Game::loadLevel(const string& route)
+ {
+	 ifstream levels(route);
+	 if (!levels.is_open()) {
+		 throw FileNotFoundError(route);
+	 }
+
+	 string line;
+	 int lineNum = 0;
+	 // getline es para saber los saltos de linea que lleva el archivo
+	 while (getline(levels, line)) {  // mientras haya lineas en el archivo
+		 ++lineNum;
+		 // flujo de entrada que lee de un string y funciona igual que cin o un ifstream
+		 istringstream streamLine(line);
+		 string word;
+		 // las líneas vacías se ignoran
+		 if (streamLine >> word) parseLevelLine(route, lineNum, word, streamLine);
+	 }
+ }
+
+ void
+ Game::parseLevelLine(const string& route, int lineNum, const string& word, istream& streamLine)
+ {
+	 if (word == "bgcolor") {
+		 if (!(streamLine >> r >> g >> b))
+			 throw FileFormatError(route, lineNum, "bgcolor necesita tres enteros (r g b)");
+	 }
+	 else if (word == "arrows") {
+		 if (!(streamLine >> numArrows) || numArrows < 0)
+			 throw FileFormatError(route, lineNum, "arrows necesita un entero no negativo");
+	 }
+	 else if (word == "baldelay") {
+		 if (!(streamLine >> balloonDelay) || balloonDelay <= 0)
+			 throw FileFormatError(route, lineNum, "baldelay necesita un valor positivo");
+		 balloonDelay = balloonDelay / 1000.0f;  // se pasan milisegundos a segundos
+	 }
+	 else if (word == "balpoints") {
+		 if (!(streamLine >> balPoints))
+			 throw FileFormatError(route, lineNum, "balpoints necesita un entero");
+	 }
+	 else if (word == "balspeed") {
+		 if (!(streamLine >> balSpeed))
+			 throw FileFormatError(route, lineNum, "balspeed necesita un número");
+	 }
+	 else if (word == "goal") {
+		 if (!(streamLine >> goal))
+			 throw FileFormatError(route, lineNum, "goal necesita un entero");
+	 }
+	 else if (word == "butterflies") {
+		 if (!(streamLine >> numButterflies) || numButterflies < 0)
+			 throw FileFormatError(route, lineNum, "butterflies necesita un entero no negativo");
+	 }
+	 // si es cualquier otra palabra se ignora
+ }
+
+ /*void
  Game::loadLevel(string route)
  {
 	 ifstream levels(route);
 	 if (!levels.is_open()) {
-		 throw "Error: No se pudo abrir el archivo con ruta (" + route + ")"s;
-		 return false;
+		 throw FileNotFoundError(route);
 	 }
 
 	 string word;
@@ -319,8 +378,7 @@ Game::generateArrow(const Point2D<>& pos) {
 			 levels.ignore(numeric_limits<streamsize>::max(), '\n');
 		 }
 	 }
-	 return true;
- }
+ }*/
 
  void
 Game::generarButterflies() {
@@ -348,13 +406,8 @@ Game::checkGoal() {
 		// Actualizamos el nivel actual antes de cargar
 		lvlActual = siguienteNivel;
 
-		// Intentamos cargar el archivo del nuevo nivel
-		if (!loadLevel(route)) {
-			throw "No se ha podido abrir el archivo de niveles";
-		}
-		else {
-			generateNewLevel();
-		}
+		loadLevel(route);
+		generateNewLevel();
 	}
 }
 
@@ -384,8 +437,7 @@ void
 Game::saveLevel(string route) {
 	ofstream save(route);
 	if (!save) {
-		throw "Error: No se pudo abrir el archivo con ruta (" + route + ")"s;
-		return;
+		throw FileNotFoundError(route);
 	}
 
 	save << lvlActual << " " << score << endl;
@@ -400,55 +452,24 @@ void
 Game::loadSavedLevel(string route) {
 	ifstream load(route);
 	if (!load) {
-		throw "Error: no se pudo abrir el archivo con ruta (" + route + ")"s;
+		throw FileNotFoundError(route);
 	}
 
 	int lvl, pts;
-	if (!(load >> lvl >> pts) || lvl < 1 || lvl > 3) {
-		throw "Error: nivel y/o puntuacion incorrectas"s;
-	}
+	int lineNum = 1;
+	readSavedHeader(load, route, lvl, pts);  // carga nivel y puntuacion
 
-	Rectangle rect(Point2D<>(0, 0), 0, 0);   // valores de relleno que luego se cargan con loadValue()
-	Vector2D<> vel(0, 0);
 	list<SceneObject*> objs;
 	bow* newBow = nullptr;
 
 	try {
-		string word;
-		while (load >> word) {
-			if (word == "bow") {
-				newBow = new bow(rect, vel, textures[BOW], 0, false, this);
-				newBow->loadValues(load);
-			}
-			else {
-				SceneObject* obj = nullptr;
-				if (word == "balloon") {
-					obj = new balloon(rect, vel, textures[BALLOON], 0, this);
-				}
-				else if (word == "arrow") {
-					obj = new arrow(rect, textures[ARROW], this, vel);
-				}
-				else if (word == "butterfly") {
-					obj = new Butterfly(rect, vel, textures[BUTTERFLY], this);
-				}
-				else {
-					throw "Error: este objeto no existe (" + word + ")"s;
-				}
-
-				objs.push_back(obj);  // se guarda el objeto en la lista de objetos
-				obj->loadValues(load);  // se cargan los valores
-			}
-		}
-
+		// va leyendo una linea por objeto
+		readSavedObjects(load, route, lineNum, objs, newBow);
 		if (newBow == nullptr) {
-			throw "Error: el arco no se ha guardado"s;
+			throw FileFormatError(route, lineNum, "el arco no se ha guardado");
 		}
-
 		// se carga el nivel (1, 2, 3...)
-		string levelRoute = LEVEL_ROOT + to_string(lvl) + ".txt";
-		if (!loadLevel(levelRoute)) {
-			throw "No se ha podido abrir el archivo de niveles"s;
-		}
+		loadLevel(LEVEL_ROOT + to_string(lvl) + ".txt");
 	}
 	// si falla la carga aqui se borra todo lo que se quedo a mitad para evitar memory leaks
 	catch (...) {
@@ -457,7 +478,7 @@ Game::loadSavedLevel(string route) {
 		throw;
 	}
 
-	// se sustituye la partida
+	// sustituye la partida actual por la cargada
 	for (SceneObject* o : objects) delete o;
 	objects = objs;
 	delete bowPtr;
@@ -465,6 +486,66 @@ Game::loadSavedLevel(string route) {
 	lvlActual = lvl;
 	score = pts;
 	cout << "se ha cargado la partida" << endl;
+}
+
+void
+Game::readSavedHeader(istream& load, const string& route, int& lvl, int& pts) {
+	string line;
+	if (!getline(load, line)) {
+		throw FileFormatError(route, 1, "el archivo está vacío");
+	}
+	istringstream streamLine(line);
+	if (!(streamLine >> lvl >> pts) || lvl < 1 || lvl > 3) {
+		throw FileFormatError(route, 1, "nivel o puntuacion incorrectas");
+	}
+}
+
+void
+Game::readSavedObjects(istream& load, const string& route, int& lineNum, list<SceneObject*>& objs, bow*& newBow) {
+	string line;
+	while (getline(load, line)) {
+		++lineNum;
+		istringstream streamLine(line);
+		string word;
+		if (streamLine >> word) {
+			try {
+				if (word == "bow") {
+					if (newBow != nullptr) {
+						throw FileFormatError(route, lineNum, "el arco aparece más de una vez");
+					}
+					// valores de relleno que luego se cargan con loadValues()
+					newBow = new bow(Rectangle(Point2D<>(0, 0), 0, 0), Vector2D<>(0, 0), textures[BOW], 0, false, this);
+					newBow->loadValues(streamLine);
+				}
+				else {
+					SceneObject* obj = createSavedObject(word);
+					if (obj == nullptr) {
+						throw FileFormatError(route, lineNum, "este objeto no existe (" + word + ")");
+					}
+					objs.push_back(obj);  // se guarda antes de cargar para poder liberarlo si falla
+					obj->loadValues(streamLine);
+				}
+			}
+			catch (const FileFormatError&) {
+				throw;
+			}
+			catch (const GameError& e) {
+				// los loadValues lanzan GameError sin conocer el archivo: se añade aquí
+				throw FileFormatError(route, lineNum, e.what());
+			}
+		}
+	}
+}
+
+SceneObject*
+Game::createSavedObject(const string& word) {
+	Rectangle rect(Point2D<>(0, 0), 0, 0);
+	Vector2D<> vel(0, 0);
+
+	if (word == "balloon") return new balloon(rect, vel, textures[BALLOON], 0, this);
+	if (word == "arrow") return new arrow(rect, textures[ARROW], this, vel);
+	if (word == "butterfly") return new Butterfly(rect, vel, textures[BUTTERFLY], this);
+	return nullptr;
 }
 
 void

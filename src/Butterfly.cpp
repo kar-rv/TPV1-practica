@@ -1,5 +1,6 @@
 #include "Butterfly.h"
 #include "game.h"
+#include "GameError.h"
 
 std::mt19937_64 Butterfly::random(std::random_device{}());
 
@@ -107,7 +108,7 @@ Butterfly::loadValues(std::istream& load) {
     MobileObject::loadValues(load);
     char n;
     if (!(load >> n) || (n != 'm' && n != 'n')) {
-        throw std::string("Error: datos de mariposa incorrectos");
+        throw GameError("Error: datos de mariposa incorrectos");
     }
         
     dead = (n == 'm');

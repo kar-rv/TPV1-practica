@@ -1,6 +1,7 @@
 #include "bow.h"
 #include "game.h"
 #include "texture.h"
+#include "GameError.h"
 #include <SDL3/SDL_render.h>
 #include <iostream>
 
@@ -81,7 +82,7 @@ bow::loadValues(std::istream& load) {
 	char n;
 	int flechas;
 	if (!(load >> u >> v >> n >> flechas) || (n != 'a' && n != 'n') || flechas < 0) {
-		throw std::string("Error: datos del arco incorrectos");
+		throw GameError("Error: datos del arco incorrectos");
 	}
 	
 	vel = Vector2D<>(u, v);

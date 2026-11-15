@@ -50,13 +50,20 @@ private:
 	void update(float delta);
 	void handleEvents();
 	void generateBalloon();
-	bool loadLevel(std::string route);
 	void generarButterflies();
 	void checkGoal();
 	void generateNewLevel();
-	void saveLevel(std::string route);
-	void loadSavedLevel(std::string route);
 	void end();
+
+	// metodos de carga / guardado de niveles
+	void saveLevel(const std::string route);
+	void loadSavedLevel(const std::string route);
+	void loadLevel(const std::string& route);
+	void parseLevelLine(const std::string& route, int lineNum, const std::string& word, std::istream& iss);
+	void readSavedHeader(std::istream& load, const std::string& route, int& lvl, int& pts);
+	void readSavedObjects(std::istream& load, const std::string& route, int& lineNum, std::list<SceneObject*>& objs, bow*& newBow);
+	SceneObject* createSavedObject(const std::string& word);
+	void applyLoadedGame(std::list<SceneObject*>& objs, bow* newBow, int lvl, int pts);
 
 	bool exit;
 	Uint64 lastTime;
