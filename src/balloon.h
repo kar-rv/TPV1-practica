@@ -6,11 +6,11 @@
 class balloon : public MobileObject
 {
 private:
-	int color;
+	int fil;  // color
 	bool dead = false;
 
 public:
-	balloon(Rectangle posDim, Vector2D<>vel, Texture* textura, int color, Game* game);
+	balloon(Rectangle posDim, Vector2D<>vel, Texture* textura, int fil, Game* game);
 	~balloon();
 
 	bool update(float delta) override;

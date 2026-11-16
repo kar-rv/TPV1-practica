@@ -10,6 +10,7 @@
 #include "arrow.h"
 #include "SceneObject.h"
 #include <random>
+#include <string>
 
 // Declaraciones anticipadas
 class Texture;
@@ -31,6 +32,8 @@ public:
 	// Tamaño real de la ventana
 	static constexpr int WINDOW_WIDTH = 800;
 	static constexpr int WINDOW_HEIGHT = 600;
+	// combo globos
+	static constexpr int COMBO_BONUS = 5;
 
 	enum TextureName
 	{
@@ -52,6 +55,8 @@ private:
 	void generateBalloon();
 	void generarButterflies();
 	void checkGoal();
+	std::string levelPath(int level) const;
+	bool levelExists(int level) const;
 	void generateNewLevel();
 	void end();
 
@@ -85,6 +90,7 @@ private:
 	int score = 0;
 	int lvlActual = 0;
 	int butPoints = -20;
+	int balloonsPopped = 0;
 
 	bool juegoTerminado = false;
 
@@ -97,6 +103,7 @@ public:
 
 	// Ejecuta el bucle principal del juego
 	void run();
+	void balloonPopped();  // combo de globos (esta en public porque lo usa balloon.cpp
 
 	// Comprueba si hay algún objeto colocado en ese rectángulo
 	bool checkCollision(const Rectangle& rect);
@@ -114,6 +121,9 @@ public:
 	}
 	int getButPoints() const { 
 		return butPoints;
+	}
+	int getBalloonsPopped() const {
+		return balloonsPopped;
 	}
 
 	bow* getBow() const {

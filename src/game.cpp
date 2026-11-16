@@ -24,6 +24,7 @@ constexpr const char* const WINDOW_TITLE = "Bow & Arrow 2.0";
 constexpr const char* IMAGE_ROOT = "../assets/images/";
 constexpr const char* LEVEL_ROOT = "../assets/levels/";
 constexpr const char* SAVES_ROOT = "../assets/saves/saved.txt";
+constexpr int FIRST_LEVEL = 1;
 
 // Estructura para especificar las texturas que hay que cargar y el tamaño de su matriz de frames
 struct TextureSpec
@@ -45,14 +46,8 @@ Game::Game()
   : exit(false), random(time(nullptr))
 {
 	// carga el archivo de niveles
-	lvlActual = 0;
-	do {
-		cout << "¿Level 1, 2 or 3?" << '\n';
-		cin >> lvlActual;
-	} while (lvlActual != 1 && lvlActual != 2 && lvlActual != 3);
-	string route = LEVEL_ROOT + to_string(lvlActual) + ".txt";
-
-	loadLevel(route);  // lanza FileNotFoundError o FileFormatError si falla
+	lvlActual = FIRST_LEVEL;
+	loadLevel(levelPath(lvlActual));  // lanza FileNotFoundError o FileFormatError si falla
 
 	// Carga SDL y crea la ventana con su renderizador
 	if (!SDL_Init(SDL_INIT_VIDEO)) throw SDLError("SDL_Init");
@@ -216,28 +211,31 @@ Game::handleEvents()
 	while (SDL_PollEvent(&event)) {
 		if (event.type == SDL_EVENT_QUIT)
 			exit = true;
-		bowPtr->handleEvent(event);
 
-		// si no es una pulsación de tecla, no se hace nada
-		if (event.type == SDL_EVENT_KEY_DOWN) {
-			bool control = (event.key.mod & SDL_KMOD_CTRL) != 0;
-			if (control && event.key.key == SDLK_S && !event.key.repeat) {
-				// !event.key.repeat evita que se ejecute todo el rato al mantenerlo pulsado
-				// se guardan los datos del juego actual
-				try {
-					saveLevel(SAVES_ROOT);
-				}
-				catch (const GameError& e) {
-					cerr << e.what() << endl;  // no se guardo
-				}
-			}
+		if (!juegoTerminado) {  // mientras el juego no haya terminado
+			bowPtr->handleEvent(event);
 
-			if (control && event.key.key == SDLK_O && !event.key.repeat) {
-				try {
-					loadSavedLevel(SAVES_ROOT);
+			// si no es una pulsación de tecla, no se hace nada
+			if (event.type == SDL_EVENT_KEY_DOWN) {
+				bool control = (event.key.mod & SDL_KMOD_CTRL) != 0;
+				if (control && event.key.key == SDLK_S && !event.key.repeat) {
+					// !event.key.repeat evita que se ejecute todo el rato al mantenerlo pulsado
+					// se guardan los datos del juego actual
+					try {
+						saveLevel(SAVES_ROOT);
+					}
+					catch (const GameError& e) {
+						cerr << e.what() << endl;  // no se guardo
+					}
 				}
-				catch (const GameError& e) {
-					cerr << e.what() << endl;   // se sigue jugando la actual si la partida no ha cargado bien
+
+				if (control && event.key.key == SDLK_O && !event.key.repeat) {
+					try {
+						loadSavedLevel(SAVES_ROOT);
+					}
+					catch (const GameError& e) {
+						cerr << e.what() << endl;   // se sigue jugando la actual si la partida no ha cargado bien
+					}
 				}
 			}
 		}
@@ -282,6 +280,18 @@ Game::generateArrow(const Point2D<>& pos) {
 	 }
 
 	return colision;
+ }
+
+ string
+ Game::levelPath(int level) const
+ {
+	 return LEVEL_ROOT + to_string(level) + ".txt";
+ }
+
+ bool
+ Game::levelExists(int level) const
+ {
+	 return ifstream(levelPath(level)).is_open();
  }
 
  void
@@ -340,48 +350,8 @@ Game::generateArrow(const Point2D<>& pos) {
 	 // si es cualquier otra palabra se ignora
  }
 
- /*void
- Game::loadLevel(string route)
- {
-	 ifstream levels(route);
-	 if (!levels.is_open()) {
-		 throw FileNotFoundError(route);
-	 }
-
-	 string word;
-	 while (levels >> word) {
-		 if (word == "bgcolor") {
-			 levels >> r >> g >> b; //colores del background
-		 }
-		 else if (word == "arrows") {
-			 levels >> numArrows;  // número de flechas
-		 }
-		 else if (word == "baldelay") {
-			 levels >> balloonDelay;  // delay del globo
-			 balloonDelay = balloonDelay / 1000.0f;  // se pasan milisegundos a segundos
-		 }
-		 else if (word == "balpoints") {
-			 levels >> balPoints; //puntuacion por globo
-		 }
-		 else if (word == "balspeed") {
-			 levels >> balSpeed; //velocidad de los globos
-		 }
-		 else if (word == "goal") {
-			 levels >> goal; //puntuación de victoria
-		 }
-		 else if (word == "butterflies") {
-			 levels >> numButterflies;  // número de mariposas
-		 }
-		 
-		 else {
-			 // si es cualquier otra palabra se ignora
-			 levels.ignore(numeric_limits<streamsize>::max(), '\n');
-		 }
-	 }
- }*/
-
  void
-Game::generarButterflies() {
+ Game::generarButterflies() {
 	 for (int i = 0; i < numButterflies; i++) {
 		 int posX = uniform_int_distribution<int>(0, WINDOW_WIDTH - 75)(random);
 		 int posY = uniform_int_distribution<int>(0, WINDOW_HEIGHT - 75)(random);
@@ -393,27 +363,23 @@ Game::generarButterflies() {
 	 }
  }
 
-void
-Game::checkGoal() {
-	if (score >= goal) {
-		int siguienteNivel = lvlActual + 1;
-		if (siguienteNivel == 4){
-			end();
-			return;
-		}
-		string route = LEVEL_ROOT + to_string(siguienteNivel) + ".txt";
-
-		// Actualizamos el nivel actual antes de cargar
-		lvlActual = siguienteNivel;
-
-		loadLevel(route);
-		generateNewLevel();
-	}
-}
+ void
+	 Game::checkGoal() {
+	 if (goal <= 0 || score < goal) return;
+	 const int nextLevel = lvlActual + 1;
+	 if (!levelExists(nextLevel)) {
+		 end();
+	 }
+	 else {
+		 lvlActual = nextLevel;
+		 loadLevel(levelPath(nextLevel));
+		 generateNewLevel();
+	 } 
+ }
 
 void
 Game::generateNewLevel() {
-	score = 140;
+	score = 0;
 	cout << "level: " << lvlActual << endl;
 	cout << "goal: " << goal << endl;
 	cout << "butterflies: " << numButterflies << endl;
@@ -469,7 +435,7 @@ Game::loadSavedLevel(string route) {
 			throw FileFormatError(route, lineNum, "el arco no se ha guardado");
 		}
 		// se carga el nivel (1, 2, 3...)
-		loadLevel(LEVEL_ROOT + to_string(lvl) + ".txt");
+		loadLevel(levelPath(lvl));
 	}
 	// si falla la carga aqui se borra todo lo que se quedo a mitad para evitar memory leaks
 	catch (...) {
@@ -495,7 +461,7 @@ Game::readSavedHeader(istream& load, const string& route, int& lvl, int& pts) {
 		throw FileFormatError(route, 1, "el archivo está vacío");
 	}
 	istringstream streamLine(line);
-	if (!(streamLine >> lvl >> pts) || lvl < 1 || lvl > 3) {
+	if (!(streamLine >> lvl >> pts) || lvl < FIRST_LEVEL || !levelExists(lvl)) {
 		throw FileFormatError(route, 1, "nivel o puntuacion incorrectas");
 	}
 }
@@ -569,4 +535,9 @@ Game::end() {
 		delete infoBarPtr;
 		infoBarPtr = nullptr;
 	}
+}
+
+void
+Game::balloonPopped() {
+	++balloonsPopped;
 }

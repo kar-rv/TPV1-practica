@@ -9,10 +9,14 @@ class Texture;
 
 class arrow : public MobileObject
 {
+private:
+	int combo = 0;
+
 public:
 	arrow(Rectangle posDim, Texture* textura, Game* game, Vector2D<>vel);
 	~arrow();
 	bool update(float delta) override;
 	void saveValues(std::ostream& save) override;
+	void loadValues(std::istream& load) override;
 };
 

@@ -3,7 +3,6 @@
 #include "GameObject.h"
 
 class Texture;
-class Bow;
 
 class infoBar: public GameObject
 {

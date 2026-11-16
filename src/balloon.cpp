@@ -45,6 +45,7 @@ balloon::hit(const Rectangle& obj) {
 		dead = true;
 		//actualizamos el score del game
 		game->changeScore(game->getBalPoints());
+		game->balloonPopped();
 		return true;
 	}
 	return false;

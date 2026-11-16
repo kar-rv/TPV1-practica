@@ -7,6 +7,7 @@
 
 #include "game.h"
 #include <string>
+#include <iostream>
 #include "GameError.h"
 
 using namespace std;
