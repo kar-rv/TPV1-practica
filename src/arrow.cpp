@@ -7,11 +7,11 @@ using namespace std;
 
 arrow::arrow(Rectangle posDim, Texture* textura, Game* game, Vector2D<>vel) :
 	MobileObject(posDim, textura, game, vel) {
-
+	game->arrowCreated();
 }
 
 arrow::~arrow() {
-
+	game->arrowDestroyed();
 }
 
 bool

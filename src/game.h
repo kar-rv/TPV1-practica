@@ -58,6 +58,7 @@ private:
 	std::string levelPath(int level) const;
 	bool levelExists(int level) const;
 	void generateNewLevel();
+	void checkDefeat();
 	void end();
 
 	// metodos de carga / guardado de niveles
@@ -91,8 +92,10 @@ private:
 	int lvlActual = 0;
 	int butPoints = -20;
 	int balloonsPopped = 0;
+	int arrowsInFlight = 0;
 
 	bool juegoTerminado = false;
+	bool juegoPerdido = false;
 
 public:
 	Game();
@@ -103,7 +106,10 @@ public:
 
 	// Ejecuta el bucle principal del juego
 	void run();
-	void balloonPopped();  // combo de globos (esta en public porque lo usa balloon.cpp
+	void balloonPopped() { ++balloonsPopped; }  // combo de globos
+	// esto es para que cuando no quede ninguna flecha ni en la pantalla ni en el arco se acabe el juego
+	void arrowCreated() { ++arrowsInFlight; }
+	void arrowDestroyed() { --arrowsInFlight; }
 
 	// Comprueba si hay algún objeto colocado en ese rectángulo
 	bool checkCollision(const Rectangle& rect);

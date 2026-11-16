@@ -126,6 +126,10 @@ Game::render() const
 
 		//pintamos el texto
 		string text = "HAS GANADO";
+		if (juegoPerdido) {
+			text = "HAS PERDIDO";
+		}
+		
 		SDL_RenderDebugText(renderer, 40, 55, text.c_str());
 
 		SDL_RenderPresent(renderer);
@@ -177,6 +181,7 @@ Game::update(float delta)
 	}
 	// vemos si hemos logrado el goal del nivel para pasar al siguiente
 	checkGoal();
+	checkDefeat();
 }
 
 void
@@ -515,6 +520,15 @@ Game::createSavedObject(const string& word) {
 }
 
 void
+Game::checkDefeat() {
+	bool noArrows = bowPtr->getNumFlechas() <= 0 && arrowsInFlight <= 0;
+	if (noArrows) {
+		juegoPerdido = true;
+		end();
+	}		
+}
+
+void
 Game::end() {
 	juegoTerminado = true;
 
@@ -535,9 +549,4 @@ Game::end() {
 		delete infoBarPtr;
 		infoBarPtr = nullptr;
 	}
-}
-
-void
-Game::balloonPopped() {
-	++balloonsPopped;
 }
