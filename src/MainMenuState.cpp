@@ -51,13 +51,7 @@ void MainMenuState::render() const
 
 void MainMenuState::handleEvent(const SDL_Event& event)
 {
-	if (event.type == SDL_EVENT_KEY_DOWN && !event.key.repeat) {
-		if (event.key.key == SDLK_RETURN || event.key.key == SDLK_SPACE) {
-			game->popState();
-			game->pushState(new PlayState(game, false));
-		}
-	}
-	else if (event.type == SDL_EVENT_MOUSE_BUTTON_DOWN && event.button.button == SDL_BUTTON_LEFT) {
+	if (event.type == SDL_EVENT_MOUSE_BUTTON_DOWN && event.button.button == SDL_BUTTON_LEFT) {
 		float mx = event.button.x;
 		float my = event.button.y;
 
