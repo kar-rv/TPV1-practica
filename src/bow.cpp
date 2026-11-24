@@ -1,5 +1,5 @@
 #include "bow.h"
-#include "game.h"
+#include "PlayState.h"
 #include "texture.h"
 #include "GameError.h"
 #include <SDL3/SDL_render.h>
@@ -7,7 +7,7 @@
 
 using namespace std;
 
-bow::bow(Rectangle posDim, Vector2D<> vel, Texture* textura, int numFlechas, bool armado, Game* game) : 
+bow::bow(Rectangle posDim, Vector2D<> vel, Texture* textura, int numFlechas, bool armado, PlayState* game) :
 	SceneObject(posDim, textura, game), vel(vel), numFlechas(numFlechas), armado(armado) {
 }
 

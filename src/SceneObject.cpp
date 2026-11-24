@@ -1,9 +1,9 @@
 #include "SceneObject.h"
-#include "game.h"
+#include "GameState.h"
 #include "texture.h"
 #include "GameError.h"
 
-SceneObject::SceneObject(Rectangle posDim, Texture* textura, Game* game) :
+SceneObject::SceneObject(Rectangle posDim, Texture* textura, PlayState* game) :
 	GameObject(game), posDim(posDim), textura(textura) {
 
 }

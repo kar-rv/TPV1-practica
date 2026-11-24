@@ -1,12 +1,13 @@
 #include "infoBar.h"
 #include "texture.h"
-#include "game.h"
+#include "PlayState.h"
 #include "bow.h"
 #include <string>
+#include "game.h"
 
 using namespace std;
 
-infoBar::infoBar(SDL_Renderer* renderer, Texture* arrowTexture, Game* game)
+infoBar::infoBar(SDL_Renderer* renderer, Texture* arrowTexture, PlayState* game)
 	: GameObject(game), renderer(renderer), arrowTexture(arrowTexture) {
 }
 

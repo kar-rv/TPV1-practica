@@ -1,5 +1,5 @@
 #include "GameObject.h"
 
-GameObject::GameObject(Game* game) : game(game) {
+GameObject::GameObject(PlayState* game) : game(game) {
 
 }

@@ -3,6 +3,8 @@
 #include "vector2D.h"
 #include "MobileObject.h"
 
+class PlayState;
+
 class balloon : public MobileObject
 {
 private:
@@ -10,7 +12,7 @@ private:
 	bool dead = false;
 
 public:
-	balloon(Rectangle posDim, Vector2D<>vel, Texture* textura, int fil, Game* game);
+	balloon(Rectangle posDim, Vector2D<>vel, Texture* textura, int fil, PlayState* game);
 	~balloon();
 
 	bool update(float delta) override;

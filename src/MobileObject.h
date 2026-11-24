@@ -2,7 +2,7 @@
 #include "SceneObject.h"
 
 class Texture;
-class Game;
+class PlayState;
 
 class MobileObject : public SceneObject
 {
@@ -13,7 +13,7 @@ protected:
 	int fil = 0;
 
 public:
-	MobileObject(Rectangle posDim, Texture* textura, Game* game, Vector2D<>vel, int fil=0);
+	MobileObject(Rectangle posDim, Texture* textura, PlayState* game, Vector2D<>vel, int fil=0);
 	virtual ~MobileObject() = default;
 	void render() const override;
 	bool update(float dt) override;

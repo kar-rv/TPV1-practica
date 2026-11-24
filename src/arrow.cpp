@@ -1,11 +1,12 @@
 #include "arrow.h"
 #include "texture.h"
-#include "game.h"
+#include "PlayState.h"
 #include "GameError.h"
+#include "game.h"
 
 using namespace std;
 
-arrow::arrow(Rectangle posDim, Texture* textura, Game* game, Vector2D<>vel) :
+arrow::arrow(Rectangle posDim, Texture* textura, PlayState* game, Vector2D<>vel) :
 	MobileObject(posDim, textura, game, vel) {
 	game->arrowCreated();
 }

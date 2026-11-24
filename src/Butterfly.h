@@ -2,11 +2,12 @@
 #include <random>
 #include "MobileObject.h"
 
+class PlayState;
 
 class Butterfly: public MobileObject
 {
 public:
-	Butterfly(Rectangle posDim, Vector2D<>vel, Texture* textura, Game* game);
+	Butterfly(Rectangle posDim, Vector2D<>vel, Texture* textura, PlayState* game);
 	~Butterfly();
 
 	bool update(float delta) override;

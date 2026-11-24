@@ -6,7 +6,7 @@
 #include <SDL3/SDL_events.h>
 
 class Texture;
-class Game;
+class PlayState;
 
 class bow: public SceneObject
 {
@@ -16,7 +16,7 @@ private:
 	bool armado;
 
 public:
-	bow(Rectangle posDim, Vector2D<> vel, Texture* textura, int numFlechas, bool armado = false, Game* game = nullptr);
+	bow(Rectangle posDim, Vector2D<> vel, Texture* textura, int numFlechas, bool armado = false, PlayState* game = nullptr);
 	~bow();
 	void render() const override;
 	bool update(float dt) override;

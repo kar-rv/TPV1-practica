@@ -1,16 +1,15 @@
 #pragma once
-
-class Game;
+class PlayState;
 
 class GameObject
 {
 public:
-	GameObject(Game* game);
+	GameObject(PlayState* game);
 	virtual ~GameObject() = default;
 	virtual void render() const = 0;
 	virtual bool update(float dt) = 0;
 
 protected:
-	Game* game;
+	PlayState* game = nullptr;
 };
 

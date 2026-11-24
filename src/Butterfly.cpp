@@ -1,10 +1,11 @@
 #include "Butterfly.h"
-#include "game.h"
+#include "PlayState.h"
 #include "GameError.h"
+#include "game.h"
 
 std::mt19937_64 Butterfly::random(std::random_device{}());
 
-Butterfly::Butterfly(Rectangle posDim, Vector2D<>vel, Texture* textura, Game* game) :
+Butterfly::Butterfly(Rectangle posDim, Vector2D<>vel, Texture* textura, PlayState* game) :
 	MobileObject(posDim, textura, game, vel){
 
 }

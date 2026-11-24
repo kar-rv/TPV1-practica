@@ -1,11 +1,11 @@
 #include "balloon.h"
 #include "texture.h"
-#include "game.h"
+#include "PlayState.h"
 #include "GameError.h"
 
 using namespace std;
 
-balloon::balloon(Rectangle posDim, Vector2D<> vel, Texture* textura, int fil, Game* game) : 
+balloon::balloon(Rectangle posDim, Vector2D<> vel, Texture* textura, int fil, PlayState* game) :
 	MobileObject(posDim,  textura, game, vel, fil) {
 
 }

@@ -1,9 +1,9 @@
 #include "MobileObject.h"
-#include "game.h"
+#include "GameState.h"
 #include "texture.h"
 #include "GameError.h"
 
-MobileObject::MobileObject(Rectangle posDim, Texture* textura, Game* game, Vector2D<>vel, int fil) :
+MobileObject::MobileObject(Rectangle posDim, Texture* textura, PlayState* game, Vector2D<>vel, int fil) :
 	SceneObject(posDim, textura, game), vel(vel), fil(fil) {
 }
 
