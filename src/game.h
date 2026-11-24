@@ -3,28 +3,18 @@
 
 #include <SDL3/SDL.h>
 #include <array>
-#include <istream>
 
 #include "gameStateMachine.h"
 
-// Declaraciones anticipadas
 class Texture;
 
-
-/**
- * Clase principal del juego.
- */
-class Game: public GameStateMachine
+class Game : public GameStateMachine
 {
 public:
-	// Número de actualizaciones por segundo
 	static constexpr int FRAME_RATE = 30;
-	// Periodo entre actualizaciones en milisegundos
 	static constexpr int FRAME_PERIOD = 1000 / FRAME_RATE;
-	// Tamaño real de la ventana
 	static constexpr int WINDOW_WIDTH = 800;
 	static constexpr int WINDOW_HEIGHT = 600;
-	// combo globos
 	static constexpr int COMBO_BONUS = 5;
 
 	enum TextureName
@@ -33,43 +23,39 @@ public:
 		ARROW,
 		BALLOON,
 		BUTTERFLY,
+		DIGITS,
+		REWARDS,
+		MENUBACKGROUND,
+		CARGAPARTIDA,
+		CONTINUAR,
+		GUARDAPARTIDA,
+		NIVEL,
+		NUEVAPARTIDA,
+		PUNTUACION,
+		SALIR,
+		VOLVERALMENU,
 		NUM_TEXTURES
 	};
 
 private:
-	SDL_Window* window;
-	SDL_Renderer* renderer;
-	std::array<Texture*, NUM_TEXTURES> textures;
+	SDL_Window* window = nullptr;
+	SDL_Renderer* renderer = nullptr;
+	std::array<Texture*, NUM_TEXTURES> textures{};
 
-	Uint64 lastTime;
+	Uint64 lastTime = 0;
+	bool exit = false;
 
 	void handleEvents();
-	// Elemento del juego
-	// TODO: añadir atributos para los objetos del juego
-	
 
 public:
 	Game();
 	~Game();
 
-	// Obtiene una textura por su nombre
-	Texture* getTexture(TextureName name) const;
-
-	// Ejecuta el bucle principal del juego
+	Texture* getTexture(TextureName name) const { return textures[name]; }
 	void run();
 
-	SDL_Window* getWindow() const { 
-		return window; 
-	}
-	
-	SDL_Renderer* getRenderer() {
-		return renderer;
-	}
+	SDL_Window* getWindow() const { return window; }
+	SDL_Renderer* getRenderer() const { return renderer; }
 };
 
-inline Texture*
-Game::getTexture(TextureName name) const
-{
-	return textures[name];
-}
 #endif // GAME_H

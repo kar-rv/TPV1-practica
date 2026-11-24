@@ -12,8 +12,6 @@
 #include <iostream>
 #include <fstream>
 #include <string>
-#include <limits>
-#include <vector>
 #include <sstream>
 
 using namespace std;
@@ -21,11 +19,25 @@ using namespace std;
 // Constantes
 constexpr const char* LEVEL_ROOT = "../assets/levels/";
 constexpr const char* SAVES_ROOT = "../assets/saves/saved.txt";
-constexpr int FIRST_LEVEL = 3;
+constexpr int FIRST_LEVEL = 1;
 
-PlayState::PlayState(Game* game) : GameState(game) {
+PlayState::PlayState(Game* game, bool cargarGuardada) : GameState(game) {
+	if (cargarGuardada) {
+		try {
+			loadSavedLevel(SAVES_ROOT);
+			return;
+		}
+		catch (const GameError& e) {
+			std::cerr << e.what() << std::endl;
+			// Si no hay partida guardada o falla, arranca el nivel inicial como alternativa
+		}
+	}
 
+	lvlActual = FIRST_LEVEL;
+	loadLevel(levelPath(lvlActual));
+	generateNewLevel();
 }
+
 PlayState::~PlayState() {
 	// se libera la memoria de todos los objetos
 	for (GameObject* object : objects) {
@@ -93,7 +105,6 @@ PlayState::update(float delta)
 {
 	if (juegoTerminado) return false;
 	// temporizador para generar globos
-	static float timeSinceLastBalloonSpawn = 0.0f;
 	timeSinceLastBalloonSpawn += delta;
 
 	// generamos los globos
@@ -110,7 +121,6 @@ PlayState::update(float delta)
 		if ((*object)->update(delta)) {
 			delete* object;
 			object = objects.erase(object);
-			cout << "borrando globo" << endl;
 		}
 		else ++object;
 	}
@@ -120,40 +130,27 @@ PlayState::update(float delta)
 	return false;
 }
 
-void
-PlayState::handleEvents()
-{
-	SDL_Event event;
+void 
+PlayState::handleEvent(const SDL_Event& event) {
+	if (!juegoTerminado) {
+		bowPtr->handleEvent(event);
 
-	// Only quit is handled directly, everything else is delegated
-	while (SDL_PollEvent(&event)) {
-		if (event.type == SDL_EVENT_QUIT)
-			exit = true;
-
-		if (!juegoTerminado) {  // mientras el juego no haya terminado
-			bowPtr->handleEvent(event);
-
-			// si no es una pulsación de tecla, no se hace nada
-			if (event.type == SDL_EVENT_KEY_DOWN) {
-				bool control = (event.key.mod & SDL_KMOD_CTRL) != 0;
-				if (control && event.key.key == SDLK_S && !event.key.repeat) {
-					// !event.key.repeat evita que se ejecute todo el rato al mantenerlo pulsado
-					// se guardan los datos del juego actual
-					try {
-						saveLevel(SAVES_ROOT);
-					}
-					catch (const GameError& e) {
-						cerr << e.what() << endl;  // no se guardo
-					}
+		if (event.type == SDL_EVENT_KEY_DOWN) {
+			bool control = (event.key.mod & SDL_KMOD_CTRL) != 0;
+			if (control && event.key.key == SDLK_S && !event.key.repeat) {
+				try {
+					saveLevel(SAVES_ROOT);
 				}
-
-				if (control && event.key.key == SDLK_O && !event.key.repeat) {
-					try {
-						loadSavedLevel(SAVES_ROOT);
-					}
-					catch (const GameError& e) {
-						cerr << e.what() << endl;   // se sigue jugando la actual si la partida no ha cargado bien
-					}
+				catch (const GameError& e) {
+					cerr << e.what() << endl;
+				}
+			}
+			if (control && event.key.key == SDLK_O && !event.key.repeat) {
+				try {
+					loadSavedLevel(SAVES_ROOT);
+				}
+				catch (const GameError& e) {
+					cerr << e.what() << endl;
 				}
 			}
 		}
@@ -194,6 +191,7 @@ PlayState::checkCollision(const Rectangle& rect)
 	for (auto object = objects.begin(); object != objects.end(); ++object) {
 		if ((*object)->hit(rect)) { //el hit de cada objeto se encarga de actualizar el score
 			colision = true;
+			cout << "score: " << score << endl;
 		}
 	}
 
@@ -318,7 +316,7 @@ PlayState::generateNewLevel() {
 }
 
 void
-PlayState::saveLevel(string route) {
+PlayState::saveLevel(const string& route) {
 	ofstream save(route);
 	if (!save) {
 		throw FileNotFoundError(route);
@@ -333,7 +331,7 @@ PlayState::saveLevel(string route) {
 }
 
 void
-PlayState::loadSavedLevel(string route) {
+PlayState::loadSavedLevel(const string& route) {
 	ifstream load(route);
 	if (!load) {
 		throw FileNotFoundError(route);

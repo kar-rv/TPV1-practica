@@ -1,15 +1,13 @@
 #include "game.h"
 #include <iostream>
-#include <fstream>
 #include <string>
-#include <limits>
-#include <vector>
-#include <sstream>
 
 #include <SDL3_image/SDL_image.h>
 
 #include "GameError.h"
 #include "texture.h"
+#include "PlayState.h"
+#include "MainMenuState.h"
 
 using namespace std;
 
@@ -30,7 +28,18 @@ constexpr array<TextureSpec, Game::NUM_TEXTURES> textureList{
 	TextureSpec{"bow.png", 1, 2},
 	TextureSpec{"arrow.png"},
 	TextureSpec{"balloons.png", 7, 6},
-	TextureSpec{"butterfly.png", 4, 10}
+	TextureSpec{"butterfly.png", 4, 10},
+	TextureSpec{"digits.png", 1, 10},
+	TextureSpec{"rewards.png", 10, 8},
+	TextureSpec{"menuBackground.png"},
+	TextureSpec{"cargarPartida.png"},
+	TextureSpec{"continuar.png"},
+	TextureSpec{"guardarPartida.png"},
+	TextureSpec{"nivel.png"},
+	TextureSpec{"nuevaPartida.png"},
+	TextureSpec{"puntuacion.png"},
+	TextureSpec{"salir.png"},
+	TextureSpec{"volverAlMenu.png"}
 };
 
 Game::Game()
@@ -63,6 +72,7 @@ Game::Game()
 		throw;
 	}
 
+	pushState(new MainMenuState(this));
 	// Configura que se pueden utilizar capas translúcidas
 	// SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
 }
@@ -106,7 +116,7 @@ void Game::handleEvents()
 	SDL_Event event;
 	while (SDL_PollEvent(&event)) {
 		if (event.type == SDL_EVENT_QUIT) {
-			return;
+			exit = true;
 		}
 		GameStateMachine::handleEvent(event);
 	}
