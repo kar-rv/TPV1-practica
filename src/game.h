@@ -53,6 +53,7 @@ public:
 
 	Texture* getTexture(TextureName name) const { return textures[name]; }
 	void run();
+	void exitGame() { exit = true; }
 
 	SDL_Window* getWindow() const { return window; }
 	SDL_Renderer* getRenderer() const { return renderer; }

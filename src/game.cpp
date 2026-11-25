@@ -44,7 +44,6 @@ constexpr array<TextureSpec, Game::NUM_TEXTURES> textureList{
 
 Game::Game()
 {
-
 	// Carga SDL y crea la ventana con su renderizador
 	if (!SDL_Init(SDL_INIT_VIDEO)) throw SDLError("SDL_Init");
 
@@ -71,7 +70,7 @@ Game::Game()
 		}
 		throw;
 	}
-
+	
 	pushState(new MainMenuState(this));
 	// Configura que se pueden utilizar capas translúcidas
 	// SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
@@ -121,5 +120,3 @@ void Game::handleEvents()
 		GameStateMachine::handleEvent(event);
 	}
 }
-
-

@@ -111,6 +111,7 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MainMenuState.cpp" />
     <ClCompile Include="MobileObject.cpp" />
+    <ClCompile Include="PauseState.cpp" />
     <ClCompile Include="PlayState.cpp" />
     <ClCompile Include="rectangle.cpp" />
     <ClCompile Include="SceneObject.cpp" />
@@ -131,6 +132,7 @@
     <ClInclude Include="infoBar.h" />
     <ClInclude Include="MainMenuState.h" />
     <ClInclude Include="MobileObject.h" />
+    <ClInclude Include="PauseState.h" />
     <ClInclude Include="PlayState.h" />
     <ClInclude Include="rectangle.h" />
     <ClInclude Include="SceneObject.h" />

@@ -5,15 +5,15 @@
 
 MainMenuState::MainMenuState(Game* game)
 	: GameState(game),
-	nuevaPartida(Point2D<>(Game::WINDOW_WIDTH / 2.0f - 100.0f, 250.0f), 200.0f, 60.0f),
-	cargarPartida(Point2D<>(Game::WINDOW_WIDTH / 2.0f - 100.0f, 350.0f), 200.0f, 60.0f)
+	nuevaPartida(Point2D<>(Game::WINDOW_WIDTH / 2.0f - 236.0f / 2.0f, 220.0f), 236.0f, 48.0f),
+	cargarPartida(Point2D<>(Game::WINDOW_WIDTH / 2.0f - 250.0f / 2.0f, 320.0f), 250.0f, 48.0f),
+	salir(Point2D<>(Game::WINDOW_WIDTH / 2.0f - 73.0f / 2.0f, 420.0f), 73.0f, 48.0f)
 {
 
 }
 
 bool MainMenuState::isPointInside(float x, float y, const Rectangle& rect) const
 {
-	// Adapta estos getters según cómo tengas nombrados los campos en tu clase Rectangle
 	float rx = rect.getTopLeftCorner().getX();
 	float ry = rect.getTopLeftCorner().getY();
 	float rw = rect.getWidth();
@@ -45,6 +45,10 @@ void MainMenuState::render() const
 	Texture* cargarPartidaTexture = game->getTexture(Game::CARGAPARTIDA);
 	cargarPartidaTexture->render(cargarPartidaRect);
 
+	SDL_FRect salirRect = salir.to_sdl();
+	Texture* salirTexture = game->getTexture(Game::SALIR);
+	salirTexture->render(salirRect);
+
 
 	SDL_RenderPresent(renderer);
 }
@@ -56,12 +60,14 @@ void MainMenuState::handleEvent(const SDL_Event& event)
 		float my = event.button.y;
 
 		if (isPointInside(mx, my, nuevaPartida)) {
-			game->popState();
-			game->pushState(new PlayState(game, false));
+			game->replaceState(new PlayState(game, false));
 		}
 		else if (isPointInside(mx, my, cargarPartida)) {
+			game->replaceState(new PlayState(game, true));
+		}
+		else if (isPointInside(mx, my, salir)) {
+			game->exitGame();
 			game->popState();
-			game->pushState(new PlayState(game, true));
 		}
 	}
 }

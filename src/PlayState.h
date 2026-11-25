@@ -35,6 +35,7 @@ private:
 
 	bool juegoTerminado = false;
 	bool juegoPerdido = false;
+	bool juegoPausado = false;
 
 	float timeSinceLastBalloonSpawn = 0.0f;
 
@@ -50,8 +51,6 @@ private:
 	void end();
 
 	// Métodos de carga / guardado de niveles
-	void saveLevel(const std::string& route);
-	void loadSavedLevel(const std::string& route);
 	void loadLevel(const std::string& route);
 	void parseLevelLine(const std::string& route, int lineNum, const std::string& word, std::istream& iss);
 	void readSavedHeader(std::istream& load, const std::string& route, int& lvl, int& pts);
@@ -66,6 +65,10 @@ public:
 	void render() const override;
 	void handleEvent(const SDL_Event& event) override;
 
+	//cargar y guardar el nivel (publivos para acceder desde pauseState
+	void saveLevel(const std::string& route);
+	void loadSavedLevel(const std::string& route);
+
 	void balloonPopped() { ++balloonsPopped; }
 	void arrowCreated() { ++arrowsInFlight; }
 	void arrowDestroyed() { --arrowsInFlight; }
@@ -79,5 +82,8 @@ public:
 	int getBalPoints() const { return balPoints; }
 	int getButPoints() const { return butPoints; }
 	int getBalloonsPopped() const { return balloonsPopped; }
+
+	void pause() { juegoPausado = !juegoPausado; }
 	bow* getBow() const { return bowPtr; }
+	Game* getGame() const { return game; }
 };

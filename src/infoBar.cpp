@@ -19,7 +19,7 @@ infoBar::render() const {
 	int arrowsLeft = game->getBow()->getNumFlechas();
 	int score = game->getScore();
 
-	const float margin = 8;
+	const float margin = 15;
 	const float arrowWidth = 30;
 	const float spacing = 6;  // espacio entre flecha y flecha
 	// se mantiene la proporción de la imagen de la flecha
@@ -38,16 +38,20 @@ infoBar::render() const {
 	}
 
 	// puntuación
-	const float scale = 2.0f;  // como el texto se ve muy pequeño por defecto pues se multiplica por dos su tamaño
-	string text = "SCORE: " + to_string(score);
-	float textWidth = text.size() * SDL_DEBUG_TEXT_FONT_CHARACTER_SIZE;  // esto calcula el tamaño de la fuente en pixeles
-
-	SDL_SetRenderScale(renderer, scale, scale);  // se amplia la escala
-	SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
-	SDL_RenderDebugText(renderer,
-		Game::WINDOW_WIDTH / scale - textWidth - margin / scale,
-		// esto es para centrar el texto en vertical (centro - altura / 2)
-		fondo.h / scale / 2 - SDL_DEBUG_TEXT_FONT_CHARACTER_SIZE / 2.0f,
-		text.c_str());  // convierte un string en un const char* (que es lo que pide el SDL_RenderDebugText)
-	SDL_SetRenderScale(renderer, 1.0f, 1.0f);  // se vuelve al valor por defecto de la escala
+	Texture* digitTexture = game->getGame()->getTexture(Game::DIGITS);
+	int points = score;
+	float x = Game::WINDOW_WIDTH - 30.0f;
+	if (score == 0) {
+		Rectangle digitRectangle(Point2D<>(x, 7.0f), 20.0f, 20.0f);
+		SDL_FRect digitRect = digitRectangle.to_sdl();
+		digitTexture->renderFrame(digitRect, 0, 0);
+	}
+	while (points != 0) {
+		int digit = points % 10;
+		points = points / 10;
+		Rectangle digitRectangle(Point2D<>(x, 10.0f), 20.0f, 20.0f);
+		x -= 22;
+		SDL_FRect digitRect = digitRectangle.to_sdl();
+		digitTexture->renderFrame(digitRect, 0, digit);
+	}
 }

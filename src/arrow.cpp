@@ -44,7 +44,12 @@ arrow::saveValues(std::ostream& save) {
 void
 arrow::loadValues(std::istream& load) {
 	MobileObject::loadValues(load);
-	if (!(load >> combo) || combo < 0) {
+	if (!(load >> combo)) {
+		combo = 0;
+		load.clear();
+		return;
+	}
+	if (combo < 0) {
 		throw GameError("Error: datos de flecha incorrectos");
 	}
 }

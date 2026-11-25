@@ -9,6 +9,7 @@ class MainMenuState : public GameState
 private:
 	Rectangle nuevaPartida;
 	Rectangle cargarPartida;
+	Rectangle salir;
 
 	bool isPointInside(float x, float y, const Rectangle& rect) const;
 

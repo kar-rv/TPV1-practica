@@ -8,6 +8,7 @@
 #include "infoBar.h"
 #include "Butterfly.h"
 #include "GameError.h"
+#include "PauseState.h"
 
 #include <iostream>
 #include <fstream>
@@ -96,43 +97,51 @@ PlayState::render() const
 		infoBarPtr->render();
 
 		// se llama al renderer
-		SDL_RenderPresent(game->getRenderer());
+		if(!juegoPausado)// solo si no esta el juego pausado para evitar el parpadeo de la pantalla de pausa
+			SDL_RenderPresent(game->getRenderer());
 	}
 }
 
 bool
 PlayState::update(float delta)
 {
-	if (juegoTerminado) return false;
-	// temporizador para generar globos
-	timeSinceLastBalloonSpawn += delta;
+	if (!juegoPausado) {
+		if (juegoTerminado) return false;
+		// temporizador para generar globos
+		timeSinceLastBalloonSpawn += delta;
 
-	// generamos los globos
-	if (timeSinceLastBalloonSpawn > balloonDelay) {
-		generateBalloon();
-		timeSinceLastBalloonSpawn = 0.0f;
-	}
-
-	infoBarPtr->update(delta);
-	bowPtr->update(delta);
-
-	// actualizamos los objetos y los eliminamos si es necesario
-	for (auto object = objects.begin(); object != objects.end(); ) {
-		if ((*object)->update(delta)) {
-			delete* object;
-			object = objects.erase(object);
+		// generamos los globos
+		if (timeSinceLastBalloonSpawn > balloonDelay) {
+			generateBalloon();
+			timeSinceLastBalloonSpawn = 0.0f;
 		}
-		else ++object;
+
+		infoBarPtr->update(delta);
+		bowPtr->update(delta);
+
+		// actualizamos los objetos y los eliminamos si es necesario
+		for (auto object = objects.begin(); object != objects.end(); ) {
+			if ((*object)->update(delta)) {
+				delete* object;
+				object = objects.erase(object);
+			}
+			else ++object;
+		}
+		// vemos si hemos logrado el goal del nivel para pasar al siguiente
+		checkGoal();
+		checkDefeat();
 	}
-	// vemos si hemos logrado el goal del nivel para pasar al siguiente
-	checkGoal();
-	checkDefeat();
 	return false;
 }
 
 void 
 PlayState::handleEvent(const SDL_Event& event) {
 	if (!juegoTerminado) {
+		if (event.type == SDL_EVENT_KEY_DOWN && !event.key.repeat && event.key.key == SDLK_ESCAPE) {
+			game->pushState(new PauseState(game, this));
+			pause();
+			return;
+		}
 		bowPtr->handleEvent(event);
 
 		if (event.type == SDL_EVENT_KEY_DOWN) {
@@ -365,6 +374,8 @@ PlayState::loadSavedLevel(const string& route) {
 	objects = objs;
 	delete bowPtr;
 	bowPtr = newBow;
+	delete infoBarPtr;
+	infoBarPtr = new infoBar(game->getRenderer(), game->getTexture(Game::ARROW), this);
 	lvlActual = lvl;
 	score = pts;
 	cout << "se ha cargado la partida" << endl;
